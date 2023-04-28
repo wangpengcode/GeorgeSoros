@@ -1,7 +1,7 @@
-package com.ben.icebergdataadaptor.persistence.service
+package com.soros.persistence.service
 
-import com.ben.icebergdataadaptor.persistence.entity.StockInfo
-import com.ben.icebergdataadaptor.persistence.repository.StockInfoRepository
+import com.soros.persistence.entity.StockInfo
+import com.soros.persistence.repository.StockInfoRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -28,7 +28,7 @@ class StockInfoPersistenceService(
 	fun queryAll(): List<StockInfo>? = try {
 		stockInfoRepository.findAll().toList()
 	} catch (e: Exception) {
-		StockHistoryPersistenceService.logger.error("#queryAll error", e)
+		logger.error("#queryAll error", e)
 		null
 	}
     

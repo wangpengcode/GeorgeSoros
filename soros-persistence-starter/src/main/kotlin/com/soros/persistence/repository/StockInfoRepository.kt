@@ -1,6 +1,6 @@
-package com.ben.icebergdataadaptor.persistence.repository
+package com.soros.persistence.repository
 
-import com.ben.icebergdataadaptor.persistence.entity.StockInfo
+import com.soros.persistence.entity.StockInfo
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 
