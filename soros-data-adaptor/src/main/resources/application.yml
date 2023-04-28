@@ -1,5 +1,7 @@
 server:
   port: 19889
+  servlet:
+    context-path: /soros
 spring:
   application:
     name: soros-data-adaptor
