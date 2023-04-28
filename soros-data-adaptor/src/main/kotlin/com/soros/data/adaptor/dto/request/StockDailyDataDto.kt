@@ -1,4 +1,4 @@
-package com.soros.data.adaptor.dto
+package com.soros.data.adaptor.dto.request
 
 import java.math.BigDecimal
 
