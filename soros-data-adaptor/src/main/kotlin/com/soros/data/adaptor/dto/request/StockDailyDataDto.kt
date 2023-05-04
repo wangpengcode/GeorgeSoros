@@ -3,6 +3,7 @@ package com.soros.data.adaptor.dto.request
 import java.math.BigDecimal
 
 data class StockDailyDataDto(
+        var code: String? = null,
         var date: String? = null,
         var open: BigDecimal? = null,
         var close: BigDecimal?= null,

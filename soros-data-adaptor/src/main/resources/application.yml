@@ -5,13 +5,52 @@ server:
 spring:
   application:
     name: soros-data-adaptor
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 2
-      idle-timeout: 60000 # 1 MIN
-      max-lifetime: 600000 # 10 MIN
-    url: jdbc:mysql://localhost:3306/ai_learning?useSSL=false&serverTimezone=UTC
-    username: root
-    password: benmupen123
+  jpa:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: update
+        dialect: org.hibernate.dialect.MySQL5Dialect
+        show_sql: true
+  shardingsphere:
+    datasource: #数据源配置
+      names: rawdata
+      common:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        type: com.zaxxer.hikari.HikariDataSource
+      rawdata:
+        jdbc-url: jdbc:mysql://localhost:3306/rawdata?useSSL=false&serverTimezone=UTC
+        username: root
+        password: benmupen123
+    rules:
+      sharding:
+        sharding-algorithms: #分片算法配置
+          table-inline:
+            type: INLINE
+            props: #在本库中分表策略，按照ID分表，通过ID除以2取模，如果为1就存到t_user1,如果为2就存到t_user2
+              algorithm-expression: stock_history_$->{ code % 100 }
+        key-generators: #主键生成策略
+          snowflake:
+            type: SNOWFLAKE
+            props:
+              worker-id: 1
+        tables: #分表策略
+          stock_history:
+            actual-data-nodes: rawdata.stock_history_$->{0..99}
+            table-strategy:
+              standard:
+                sharding-column: code
+                sharding-algorithm-name: table-inline
+    props:
+      sql-show: true
+
+#  datasource:
+#    driver-class-name: com.mysql.jdbc.Driver
+#    hikari:
+#      maximum-pool-size: 10
+#      minimum-idle: 2
+#      idle-timeout: 60000 # 1 MIN
+#      max-lifetime: 600000 # 10 MIN
+#    url: jdbc:mysql://localhost:3306/ai_learning?useSSL=false&serverTimezone=UTC
+#    username: root
+#    password: benmupen123

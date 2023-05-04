@@ -1,4 +1,4 @@
-CREATE TABLE `stock_info` (
+CREATE TABLE if not exists rawdata.`stock_info` (
   `code` varchar(20) NOT NULL DEFAULT '000000' COMMENT 'stock code',
   `name` varchar(64) NOT NULL DEFAULT '' COMMENT '名称',
   `full_name` varchar(200) NOT NULL DEFAULT '' COMMENT '全称',
