@@ -1,38 +1,45 @@
 package com.soros.data.adaptor.entity
 
+import lombok.AllArgsConstructor
+import lombok.NoArgsConstructor
 import java.math.BigDecimal
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity(name="stock_history")
+//@Entity
+@AllArgsConstructor
+@NoArgsConstructor
 data class StockHistoryEntity(
+
         @Id
-        @Column(name = "code", length = 20)
+        @GeneratedValue(strategy = GenerationType.SEQUENCE)
+        var id: Long? = null,
+
+        @Column(name = "st_code", length = 20)
         val code: String,
         /** **/
-        @Column(name = "date", length = 20)
+        @Column(name = "st_date", length = 20)
         val date: String,
         /** **/
-        @Column(name = "open")
+        @Column(name = "st_open")
         var open: BigDecimal? = null,
 
-        @Column(name = "close")
+        @Column(name = "st_close")
         var close: BigDecimal? = null,
 
-        @Column(name = "high")
+        @Column(name = "st_high")
         var high: BigDecimal? = null,
 
-        @Column(name = "low")
+        @Column(name = "st_low")
         var low: BigDecimal? = null,
 
-        @Column(name = "volume")
+        @Column(name = "st_volume")
         var volume: BigDecimal? = null,
 
         @Column(name = "total_amount")
         var totalAmount: BigDecimal? = null,
 
-        @Column(name = "range")
+        @Column(name = "st_range")
         var range: BigDecimal? = null,
 
         @Column(name = "zd_range")
@@ -41,8 +48,10 @@ data class StockHistoryEntity(
         @Column(name = "zd_amount")
         var zdAmount: BigDecimal? = null,
 
-        @Column(name = "change")
+        @Column(name = "st_change")
         var change: BigDecimal? = null
 ) {
 //    var id: Int = code.toInt()
+
+
 }

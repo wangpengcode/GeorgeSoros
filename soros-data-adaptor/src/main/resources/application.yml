@@ -8,10 +8,12 @@ spring:
   jpa:
     properties:
       hibernate:
+        ddl-auto: create-drop
+#        ddl-auto: none
         hbm2ddl:
           auto: update
         dialect: org.hibernate.dialect.MySQL5Dialect
-        show_sql: true
+        show_sql: false
   shardingsphere:
     datasource: #数据源配置
       names: rawdata
@@ -26,9 +28,13 @@ spring:
       sharding:
         sharding-algorithms: #分片算法配置
           table-inline:
-            type: INLINE
-            props: #在本库中分表策略，按照ID分表，通过ID除以2取模，如果为1就存到t_user1,如果为2就存到t_user2
-              algorithm-expression: stock_history_$->{ code % 100 }
+            type: HASH_MOD
+            props:
+              sharding-count: '100'
+#            type: INLINE
+#            props:
+#              algorithm-expression: stock_history_$->{ st_code % 100 }
+
         key-generators: #主键生成策略
           snowflake:
             type: SNOWFLAKE
@@ -39,10 +45,10 @@ spring:
             actual-data-nodes: rawdata.stock_history_$->{0..99}
             table-strategy:
               standard:
-                sharding-column: code
+                sharding-column: st_code
                 sharding-algorithm-name: table-inline
     props:
-      sql-show: true
+      sql-show: false
 
 #  datasource:
 #    driver-class-name: com.mysql.jdbc.Driver

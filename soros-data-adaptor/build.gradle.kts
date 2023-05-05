@@ -29,10 +29,12 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 //    implementation("org.flywaydb:flyway-core")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+//    implementation("org.antlr:antlrv4-runtime:4.8")
     implementation("mysql:mysql-connector-java:8.0.33")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("io.vavr:vavr-jackson:0.10.3")
     implementation("org.apache.shardingsphere:shardingsphere-jdbc-core-spring-boot-starter:5.0.0-alpha")
+//    implementation("org.apache.shardingsphere:shardingsphere-jdbc-core-spring-boot-starter:5.1.1")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.projectlombok:lombok:1.18.26")
@@ -50,4 +52,10 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+configurations.all {
+    resolutionStrategy {
+        failOnVersionConflict()
+    }
 }

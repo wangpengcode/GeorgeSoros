@@ -32,6 +32,7 @@ class OuterStockInfoController(
     }
 
     @RequestMapping("/all", method = [RequestMethod.GET])
+    @ResponseBody
     fun allList(): List<String>? {
         return try {
             service.queryAll()?.stream()?.map { it.code }?.toList()

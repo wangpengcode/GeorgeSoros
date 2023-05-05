@@ -16,6 +16,7 @@ class StockHistoryPersistenceService(
 		logger.error("saveAll error", e)
 	}
 	fun save(entity: StockHistoryEntity) = try {
+		println(entity)
 		stockHistoryRepository.save(entity)
 	} catch (e: Exception) {
 		logger.error("#save error:", e)
