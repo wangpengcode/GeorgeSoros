@@ -17,6 +17,9 @@ data class StockHistoryEntity(
 
         @Column(name = "st_code", length = 20)
         val code: String,
+
+        @Column(name = "partition_code", length = 20)
+        var partitionCode: Long?,
         /** **/
         @Column(name = "st_date", length = 20)
         val date: String,
@@ -53,5 +56,7 @@ data class StockHistoryEntity(
 ) {
 //    var id: Int = code.toInt()
 
-
+        init {
+            this.partitionCode = this.code.toLong()
+        }
 }

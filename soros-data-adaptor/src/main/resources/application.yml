@@ -28,7 +28,7 @@ spring:
       sharding:
         sharding-algorithms: #分片算法配置
           table-inline:
-            type: HASH_MOD
+            type: MOD
             props:
               sharding-count: '100'
 #            type: INLINE
@@ -45,7 +45,7 @@ spring:
             actual-data-nodes: rawdata.stock_history_$->{0..99}
             table-strategy:
               standard:
-                sharding-column: st_code
+                sharding-column: partition_code
                 sharding-algorithm-name: table-inline
     props:
       sql-show: false
