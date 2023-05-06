@@ -6,7 +6,6 @@ import java.math.BigDecimal
 import javax.persistence.*
 
 @Entity(name="stock_history")
-//@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 data class StockHistoryEntity(

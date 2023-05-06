@@ -4,7 +4,6 @@ import com.soros.data.adaptor.dto.request.StockDailyDataDto
 import com.soros.data.adaptor.dto.request.StockInfo
 import com.soros.data.adaptor.entity.StockHistoryEntity
 import com.soros.data.adaptor.entity.StockInfoEntity
-import org.apache.shardingsphere.sharding.algorithm.sharding.mod.HashModShardingAlgorithm
 
 fun StockInfo.toStockInfoEntity(): StockInfoEntity {
     return StockInfoEntity(

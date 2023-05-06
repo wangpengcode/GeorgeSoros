@@ -35,6 +35,7 @@ dependencies {
     implementation("io.vavr:vavr-jackson:0.10.3")
     implementation("org.apache.shardingsphere:shardingsphere-jdbc-core-spring-boot-starter:5.0.0-alpha")
 //    implementation("org.apache.shardingsphere:shardingsphere-jdbc-core-spring-boot-starter:5.1.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.projectlombok:lombok:1.18.26")
