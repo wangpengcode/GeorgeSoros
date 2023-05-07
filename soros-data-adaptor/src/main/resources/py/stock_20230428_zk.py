@@ -18,10 +18,14 @@ for ro in r.split(","):
 	daJson = json.loads(da)
 	start_date = daJson['maxDate']
 	today = daJson['today']
-	stock_zh_a_hist_df = ak.stock_zh_a_hist(symbol=a, period="daily", start_date=start_date, end_date=today, adjust="qfq")
+	if start_date == today:
+		continue
+	if a.startswith('688'):
+		stock_zh_a_hist_df = ak.stock_zh_kcb_daily(symbol="sh"+a, adjust="qfq")
+	else:
+		stock_zh_a_hist_df = ak.stock_zh_a_hist(symbol=a, period="daily", start_date=start_date, end_date=today, adjust="qfq")
 	for index, row in stock_zh_a_hist_df.iterrows():
 		s = '{"date":"'+str(row[0])+'","open":'+str(row[1])+',"close":'+str(row[2])+',"high":'+str(row[3])+',"low":'+str(row[4])+',"volume":'+str(row[5])+',"totalAmount":'+str(row[6])+',"range":'+str(row[7])+',"zdRange":'+str(row[8])+',"zdAmount":'+str(row[9])+',"change":'+str(row[10])+',"code":"'+str(a)+'"}'
 		d =  json.dumps(eval(s))
 		requests.post(url, data=d, headers=headers)
 
-	
