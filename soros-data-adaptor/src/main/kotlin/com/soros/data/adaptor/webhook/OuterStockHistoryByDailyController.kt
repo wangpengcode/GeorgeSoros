@@ -43,13 +43,13 @@ class OuterStockHistoryByDailyController(
             try {
                 service.saveAll(historyEntities)
             } catch (e: Exception) {
-                try {
-                    historyEntities.forEach {
+                historyEntities.forEach {
+                    try {
                         service.save(it)
-                    }
-                } catch (e: Exception) {
-                    if (e !is DataIntegrityViolationException) {
-                        logger.error("OuterStockHistoryByDailyController#saveHistoryEntity with error:", e)
+                    } catch (e: Exception) {
+                        if (e !is DataIntegrityViolationException) {
+                            logger.error("OuterStockHistoryByDailyController#saveHistoryEntity with error:", e)
+                        }
                     }
                 }
             }
