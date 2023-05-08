@@ -40,7 +40,19 @@ class OuterStockHistoryByDailyController(
     private fun saveHistoryEntity(entity: StockHistoryEntity) {
         historyEntities.add(entity)
         if (historyEntities.size >= SAVE_ENTITIES_SIZE) {
-            service.saveAll(historyEntities)
+            try {
+                service.saveAll(historyEntities)
+            } catch (e: Exception) {
+                try {
+                    historyEntities.forEach {
+                        service.save(it)
+                    }
+                } catch (e: Exception) {
+                    if (e !is DataIntegrityViolationException) {
+                        logger.error("OuterStockHistoryByDailyController#saveHistoryEntity with error:", e)
+                    }
+                }
+            }
             historyEntities.clear()
             logger.info("OuterStockHistoryByDailyController#saveHistoryEntity save $SAVE_ENTITIES_SIZE.")
         }
