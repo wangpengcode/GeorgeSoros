@@ -13,7 +13,7 @@ class StockHistoryPersistenceService(
 	fun saveAll(entities: List<StockHistoryEntity>) = try {
 		stockHistoryRepository.saveAll(entities)
 	} catch (e: Exception) {
-		logger.error("saveAll error", e)
+		throw e
 	}
 	fun save(entity: StockHistoryEntity) = try {
 		println(entity)
