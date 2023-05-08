@@ -57,7 +57,8 @@ class OuterStockHistoryByDailyController(
             logger.error("OuterStockHistoryByDailyController#findMaxDateByNo error", e)
         }
         return ResponseStockInfo(
-                maxDate = if (maxDate == null || maxDate == "") "20200101" else maxDate.replace("-", ""),
+                maxDate = if (maxDate == null || maxDate == "") "20200101"
+                else (maxDate.replace("-", "").toInt() + 1).toString(),
                 today = now.toString()
         )
     }
