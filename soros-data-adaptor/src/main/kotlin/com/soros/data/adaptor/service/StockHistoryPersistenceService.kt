@@ -16,10 +16,9 @@ class StockHistoryPersistenceService(
 		throw e
 	}
 	fun save(entity: StockHistoryEntity) = try {
-		println(entity)
 		stockHistoryRepository.save(entity)
 	} catch (e: Exception) {
-		logger.error("#save error:", e)
+		throw e
 	}
 	
 	fun findByStockNo(stockNo: String): List<StockHistoryEntity> {
