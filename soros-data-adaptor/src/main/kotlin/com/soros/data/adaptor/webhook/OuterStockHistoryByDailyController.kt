@@ -8,6 +8,7 @@ import com.soros.data.adaptor.extension.toStockHistoryEntity
 import com.soros.data.adaptor.service.StockHistoryPersistenceService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
@@ -26,8 +27,10 @@ class OuterStockHistoryByDailyController(
         logger.info("OuterStockHistoryByDailyController#dailyData stock{}.", stock)
         try {
             saveHistoryEntity(stock.toStockHistoryEntity())
+        } catch (e: DataIntegrityViolationException) {
+
         } catch (e: Exception) {
-            logger.error("OuterStockHistoryByDailyController#dailyData with error:", e)
+            logger.error("OuterStockHistoryByDailyController#dailyData error:", e)
         }
         return ResponseCommonBody(
                 msg = "ok"

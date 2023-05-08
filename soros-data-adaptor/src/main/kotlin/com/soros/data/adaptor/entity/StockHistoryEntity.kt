@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor
 import java.math.BigDecimal
 import javax.persistence.*
 
-@Entity(name="stock_history")
+@Entity(name = "stock_history")
 @AllArgsConstructor
 @NoArgsConstructor
 data class StockHistoryEntity(
@@ -53,9 +53,7 @@ data class StockHistoryEntity(
         @Column(name = "st_change")
         var change: BigDecimal? = null
 ) {
-//    var id: Int = code.toInt()
-
-        init {
-            this.partitionCode = this.code.toLong()
-        }
+    init {
+        this.partitionCode = this.code.replace("sz", "").replace("sh", "").toLong()
+    }
 }
