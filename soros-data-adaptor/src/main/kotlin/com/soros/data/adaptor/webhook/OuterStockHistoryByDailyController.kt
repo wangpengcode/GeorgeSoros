@@ -6,6 +6,8 @@ import com.soros.data.adaptor.dto.response.ResponseStockInfo
 import com.soros.data.adaptor.entity.StockHistoryEntity
 import com.soros.data.adaptor.extension.toStockHistoryEntity
 import com.soros.data.adaptor.service.StockHistoryPersistenceService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
@@ -21,11 +23,11 @@ class OuterStockHistoryByDailyController(
     @RequestMapping("/daily", method = [RequestMethod.POST])
     @ResponseBody
     fun dailyData(@RequestBody stock: StockDailyDataDto): ResponseCommonBody {
-        println(stock)
+        logger.info("OuterStockHistoryByDailyController#dailyData stock{}.", stock)
         try {
             saveHistoryEntity(stock.toStockHistoryEntity())
         } catch (e: Exception) {
-
+            logger.error("OuterStockHistoryByDailyController#dailyData with error:", e)
         }
         return ResponseCommonBody(
                 msg = "ok"
@@ -37,7 +39,7 @@ class OuterStockHistoryByDailyController(
         if (historyEntities.size >= SAVE_ENTITIES_SIZE) {
             service.saveAll(historyEntities)
             historyEntities.clear()
-            println("save history size = $SAVE_ENTITIES_SIZE")
+            logger.info("OuterStockHistoryByDailyController#saveHistoryEntity save $SAVE_ENTITIES_SIZE.")
         }
     }
 
@@ -49,7 +51,7 @@ class OuterStockHistoryByDailyController(
         try {
             maxDate = service.findMaxDateByStockNo(stockNo)
         } catch (e: Exception) {
-
+            logger.error("OuterStockHistoryByDailyController#findMaxDateByNo error", e)
         }
         return ResponseStockInfo(
                 maxDate = if (maxDate == null || maxDate == "") "20200101" else maxDate.replace("-", ""),
@@ -58,6 +60,7 @@ class OuterStockHistoryByDailyController(
     }
 
     companion object {
-        const val SAVE_ENTITIES_SIZE: Int = 100
+        const val SAVE_ENTITIES_SIZE: Int = 300
+        val logger: Logger = LoggerFactory.getLogger(OuterStockHistoryByDailyController::class.java)
     }
 }

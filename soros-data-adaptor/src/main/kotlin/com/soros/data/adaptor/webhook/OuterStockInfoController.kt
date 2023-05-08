@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.ResponseBody
 import kotlin.streams.toList
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 @Controller
 @RequestMapping("/info")
@@ -19,11 +21,11 @@ class OuterStockInfoController(
     @RequestMapping("/stock", method = [RequestMethod.POST])
     @ResponseBody
     fun dailyData(@RequestBody info: StockInfo): ResponseCommonBody {
-        println(info)
         try {
+            logger.info("OuterStockInfoController#dailyData stockInfo {}",info)
             service.save(info.toStockInfoEntity())
         } catch (e: Exception) {
-
+            logger.error("OuterStockInfoController#dailyData error with:",e)
         }
         return ResponseCommonBody(
                 msg = "ok"
@@ -38,5 +40,9 @@ class OuterStockInfoController(
         } catch (e: Exception) {
             null
         }
+    }
+
+    companion object {
+        val logger: Logger = LoggerFactory.getLogger(OuterStockInfoController::class.java)
     }
 }
