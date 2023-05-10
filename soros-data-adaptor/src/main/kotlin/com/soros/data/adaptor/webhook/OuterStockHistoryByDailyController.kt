@@ -81,7 +81,7 @@ class OuterStockHistoryByDailyController(
     }
 
     companion object {
-        const val SAVE_ENTITIES_SIZE: Int = 300
+        const val SAVE_ENTITIES_SIZE: Int = 100
         val logger: Logger = LoggerFactory.getLogger(OuterStockHistoryByDailyController::class.java)
     }
 }
