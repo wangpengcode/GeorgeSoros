@@ -2,7 +2,7 @@ package com.soros.data.adaptor.webhook
 
 import com.soros.data.adaptor.dto.request.StockInfo
 import com.soros.data.adaptor.dto.response.ResponseCommonBody
-import com.soros.data.adaptor.extension.toStockInfoEntity
+import com.soros.data.adaptor.transformer.toStockInfoEntity
 import com.soros.data.adaptor.service.StockInfoPersistenceService
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestBody

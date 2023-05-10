@@ -21,14 +21,14 @@ class StockHistoryPersistenceService(
 		throw e
 	}
 	
-	fun findByStockNo(stockNo: String): List<StockHistoryEntity> {
+	fun findByStockNo(stockNo: String): List<StockHistoryEntity>? {
 		return stockHistoryRepository.findByStockNo(stockNo)
 	}
 
-	fun findMaxDateByStockNo(stockNo: String): String {
-		return stockHistoryRepository.findByStockNo(stockNo).stream()
-				.max(Comparator.comparing(StockHistoryEntity::date)).map { it.date }
-				.orElse(null)
+	fun findMaxDateByStockNo(stockNo: String): String? {
+		return stockHistoryRepository.findByStockNo(stockNo)?.stream()
+				?.max(Comparator.comparing(StockHistoryEntity::date))
+				?.map { it.date }?.orElse(null)
 	}
 
     companion object {

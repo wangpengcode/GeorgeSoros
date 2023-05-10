@@ -4,7 +4,7 @@ import com.soros.data.adaptor.dto.request.StockDailyDataDto
 import com.soros.data.adaptor.dto.response.ResponseCommonBody
 import com.soros.data.adaptor.dto.response.ResponseStockInfo
 import com.soros.data.adaptor.entity.StockHistoryEntity
-import com.soros.data.adaptor.extension.toStockHistoryEntity
+import com.soros.data.adaptor.transformer.toStockHistoryEntity
 import com.soros.data.adaptor.service.StockHistoryPersistenceService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

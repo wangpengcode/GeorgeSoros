@@ -21,7 +21,7 @@ data class StockHistoryEntity(
         var partitionCode: Long?,
         /** **/
         @Column(name = "st_date", length = 20)
-        val date: String,
+        var date: String,
         /** **/
         @Column(name = "st_open")
         var open: BigDecimal? = null,

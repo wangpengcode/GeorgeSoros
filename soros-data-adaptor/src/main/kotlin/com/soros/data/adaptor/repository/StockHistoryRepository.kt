@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository
 
 interface StockHistoryRepository : CrudRepository<StockHistoryEntity, Long> {
 	@Query("select * from stock_history c where c.st_code = :code", nativeQuery = true)
-	fun findByStockNo(code: String): List<StockHistoryEntity>
+	fun findByStockNo(code: String): List<StockHistoryEntity>?
 }
