@@ -9,6 +9,7 @@ import com.soros.data.adaptor.service.StockHistoryPersistenceService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
@@ -40,21 +41,25 @@ class OuterStockHistoryByDailyController(
     private fun saveHistoryEntity(entity: StockHistoryEntity) {
         historyEntities.add(entity)
         if (historyEntities.size >= SAVE_ENTITIES_SIZE) {
-            try {
-                service.saveAll(historyEntities)
-            } catch (e: Exception) {
-                historyEntities.forEach {
-                    try {
-                        service.save(it)
-                    } catch (e: Exception) {
-                        if (e !is DataIntegrityViolationException) {
-                            logger.error("OuterStockHistoryByDailyController#saveHistoryEntity with error:", e)
-                        }
+            saveHistories(historyEntities)
+            historyEntities.clear()
+            logger.info("OuterStockHistoryByDailyController#saveHistoryEntity save $SAVE_ENTITIES_SIZE.")
+        }
+    }
+    @Async(value = "asyncExecutor")
+    private fun saveHistories(list: List<StockHistoryEntity>) {
+        try {
+            service.saveAll(list)
+        } catch (e: Exception) {
+            historyEntities.forEach {
+                try {
+                    service.save(it)
+                } catch (e: Exception) {
+                    if (e !is DataIntegrityViolationException) {
+                        logger.error("OuterStockHistoryByDailyController#saveHistoryEntity with error:", e)
                     }
                 }
             }
-            historyEntities.clear()
-            logger.info("OuterStockHistoryByDailyController#saveHistoryEntity save $SAVE_ENTITIES_SIZE.")
         }
     }
 

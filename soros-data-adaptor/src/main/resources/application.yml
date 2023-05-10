@@ -66,13 +66,13 @@ schedule:
 # 自定义异步任务线程池
 async-task:
   # 核心线程池大小
-  corePoolSize: 15
+  corePoolSize: 40
   # 最大线程数大小
-  maximumPoolSize: 60
+  maximumPoolSize: 120
   # 活跃时间：秒
   keepAliveSeconds: 300
   # 线程等待队列大小
-  queueCapacity: 2000
+  queueCapacity: 3000
   # 自定义线程名称前缀
   threadNamePrefix: Async-Task-
   # 设置终止等待时间：秒
