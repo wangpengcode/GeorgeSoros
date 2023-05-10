@@ -27,7 +27,7 @@ class OuterStockHistoryByDailyController(
     @RequestMapping("/daily", method = [RequestMethod.POST])
     @ResponseBody
     fun dailyData(@RequestBody stock: StockDailyDataDto): ResponseCommonBody {
-        logger.info("OuterStockHistoryByDailyController#dailyData stock{}.", stock)
+//        logger.info("OuterStockHistoryByDailyController#dailyData stock{}.", stock)
         try {
             saveHistoryEntity(stock.toStockHistoryEntity())
         } catch (e: DataIntegrityViolationException) {
@@ -50,6 +50,7 @@ class OuterStockHistoryByDailyController(
     }
     @Async(value = "asyncExecutor")
     private fun saveHistories(list: List<StockHistoryEntity>) {
+        val start = LocalDateTime.now().second
         try {
             service.saveAll(list)
         } catch (e: Exception) {
@@ -63,6 +64,8 @@ class OuterStockHistoryByDailyController(
                 }
             }
         }
+        val end = LocalDateTime.now().second
+        logger.info("asyncExecutor used ${end - start}")
     }
 
     @RequestMapping("/max/date/{stockNo}", method = [RequestMethod.GET])

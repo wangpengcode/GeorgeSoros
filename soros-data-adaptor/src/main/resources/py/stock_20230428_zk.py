@@ -1,6 +1,8 @@
 import akshare as ak
 import requests
 import json
+import time
+import datetime
 
 url='http://192.168.0.100:19889/soros/history/daily'
 url_stock_list='http://192.168.0.100:19889/soros/info/all'
@@ -10,6 +12,8 @@ headers = {'content-type': 'application/json'}
 
 r = requests.get(url=url_stock_list).text
 for ro in r.split(","):
+	t = time.time()
+	start_time = int(t)
 	try:
 		a = ro.lstrip('[')
 		a = a.rstrip(']')
@@ -23,6 +27,7 @@ for ro in r.split(","):
 		if start_date >= today:
 			continue
 		if a.startswith('688'):
+			continue
 			stock_zh_a_hist_df = ak.stock_zh_kcb_daily(symbol="sh"+a, adjust="qfq")
 			for index, row in stock_zh_a_hist_df.iterrows():
 				s = '{"date":"'+str(row[0])+'","open":'+str(row[1])+',"high":'+str(row[2])+',"low":'+str(row[3])+',"close":'+str(row[4])+',"volume":'+str(row[5])+',"totalAmount":'+str(0)+',"range":'+str(0)+',"zdRange":'+str(0)+',"zdAmount":'+str(0)+',"change":'+str(row[9])+',"code":"'+str(a)+'"}'
@@ -36,6 +41,10 @@ for ro in r.split(","):
 				requests.post(url, data=d, headers=headers)
 	except BaseException:
 		continue
+	t = time.time()
+	end_time = int(t)
+	print(str(end_time-start_time))
+
 
 r = requests.get(url=url_all_index).text
 for ro in r.split(","):

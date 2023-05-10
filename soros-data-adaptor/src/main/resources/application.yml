@@ -83,4 +83,4 @@ async-task:
 customer:
   config:
     startDate: 20100101
-    historyHandleSize: 50
+    historyHandleSize: 100
