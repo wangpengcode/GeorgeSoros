@@ -1,6 +1,7 @@
 package com.soros.data.adaptor.job
 
 import com.soros.data.adaptor.common.Commons.Companion.SCALE_OF_SOROS
+import com.soros.data.adaptor.domain.bo.StockStatisticsDomainBo
 import com.soros.data.adaptor.domain.bo.StockStatisticsMacroscopicDomainBo
 import com.soros.data.adaptor.domain.bo.StockStatisticsMonthDomainBo
 import com.soros.data.adaptor.entity.StockInfoEntity
@@ -9,6 +10,7 @@ import com.soros.data.adaptor.service.StockHistoryPersistenceService
 import com.soros.data.adaptor.service.StockIndexPersistenceService
 import com.soros.data.adaptor.service.StockInfoPersistenceService
 import com.soros.data.adaptor.service.StockStatisticsPersistenceService
+import com.soros.data.adaptor.transformer.toStockStatisticsEntity
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Async
@@ -59,15 +61,15 @@ class StatisticsJob(
                     date = h.date,
                     averagePrice = averagePrice,
                     averageVolume = averageVolume,
-                    averageFlat = BigDecimal(preHistory.stream().map { it.zdAmount == BigDecimal.ZERO }.toList().size).divide(totalNumber, SCALE_OF_SOROS, RoundingMode.HALF_EVEN),
-                    averageProfit = BigDecimal(preHistory.stream().map { it.zdAmount!! > BigDecimal.ZERO }.toList().size).divide(totalNumber, SCALE_OF_SOROS, RoundingMode.HALF_EVEN),
-                    averageLoss = BigDecimal(preHistory.stream().map { it.zdAmount!! < BigDecimal.ZERO }.toList().size).divide(totalNumber, SCALE_OF_SOROS, RoundingMode.HALF_EVEN),
+                    averageFlat = BigDecimal(preHistory.stream().filter { it.zdAmount == BigDecimal.ZERO }.toList().size).divide(totalNumber, SCALE_OF_SOROS, RoundingMode.HALF_EVEN),
+                    averageProfit = BigDecimal(preHistory.stream().filter { it.zdAmount!! > BigDecimal.ZERO }.toList().size).divide(totalNumber, SCALE_OF_SOROS, RoundingMode.HALF_EVEN),
+                    averageLoss = BigDecimal(preHistory.stream().filter { it.zdAmount!! < BigDecimal.ZERO }.toList().size).divide(totalNumber, SCALE_OF_SOROS, RoundingMode.HALF_EVEN),
                     overAveragePriceIndex = overPriceIndex,
                     overAverageVolumeIndex = overVolumeIndex
             )
             macroscopicDomainBoList.add(macroscopicDomainBo)
         }
-        val historyForMonth = histories.stream().map { it.apply { date = date.substring(5, 6) } }.collect(Collectors.groupingBy { it.date })
+        val historyForMonth = histories.stream().map { it.apply { date = date.substring(5, 7) } }.collect(Collectors.groupingBy { it.date })
         val historyForMonthBo = mutableListOf<StockStatisticsMonthDomainBo>()
         for (i in historyForMonth) {
             val averagePrice = i.value.stream().map { it.close!! }.reduce(BigDecimal.ZERO, BigDecimal::add).divide(BigDecimal(i.value.size), SCALE_OF_SOROS, RoundingMode.HALF_EVEN)
@@ -76,14 +78,20 @@ class StatisticsJob(
                     month = i.key,
                     averagePrice = averagePrice,
                     averageVolume = averageVolume,
-                    averageFlat = BigDecimal(i.value.stream().filter { it.close == BigDecimal.ZERO }.toList().size).divide(BigDecimal(i.value.size), SCALE_OF_SOROS, RoundingMode.HALF_EVEN),
-                    averageProfit = BigDecimal(i.value.stream().filter { it.close!! > BigDecimal.ZERO }.toList().size).divide(BigDecimal(i.value.size), SCALE_OF_SOROS, RoundingMode.HALF_EVEN),
-                    averageLoss = BigDecimal(i.value.stream().filter { it.close!! < BigDecimal.ZERO }.toList().size).divide(BigDecimal(i.value.size), SCALE_OF_SOROS, RoundingMode.HALF_EVEN),
+                    averageFlat = BigDecimal(i.value.stream().filter { it.zdAmount == BigDecimal.ZERO }.toList().size).divide(BigDecimal(i.value.size), SCALE_OF_SOROS, RoundingMode.HALF_EVEN),
+                    averageProfit = BigDecimal(i.value.stream().filter { it.zdAmount!! > BigDecimal.ZERO }.toList().size).divide(BigDecimal(i.value.size), SCALE_OF_SOROS, RoundingMode.HALF_EVEN),
+                    averageLoss = BigDecimal(i.value.stream().filter { it.zdAmount!! < BigDecimal.ZERO }.toList().size).divide(BigDecimal(i.value.size), SCALE_OF_SOROS, RoundingMode.HALF_EVEN),
                     overAveragePriceIndex = BigDecimal(i.value.stream().filter { it.close!! > averagePrice }.toList().size).divide(BigDecimal(i.value.size), SCALE_OF_SOROS, RoundingMode.HALF_EVEN),
                     overAverageVolumeIndex = BigDecimal(i.value.stream().filter { it.volume!! > averageVolume }.toList().size).divide(BigDecimal(i.value.size), SCALE_OF_SOROS, RoundingMode.HALF_EVEN)
             )
             historyForMonthBo.add(bo)
         }
+        service.save(StockStatisticsDomainBo(
+                code = stockInfo.code,
+                type = type.name,
+                macroscopicDomainBo = macroscopicDomainBoList,
+                monthDomainBo = historyForMonthBo
+        ).toStockStatisticsEntity())
     }
 
     companion object {
