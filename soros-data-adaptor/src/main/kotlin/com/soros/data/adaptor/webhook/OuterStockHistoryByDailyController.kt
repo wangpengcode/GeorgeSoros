@@ -1,5 +1,6 @@
 package com.soros.data.adaptor.webhook
 
+import com.soros.data.adaptor.config.CustomerConfiguration
 import com.soros.data.adaptor.dto.request.StockDailyDataDto
 import com.soros.data.adaptor.dto.response.ResponseCommonBody
 import com.soros.data.adaptor.dto.response.ResponseStockInfo
@@ -18,7 +19,8 @@ import java.time.format.DateTimeFormatter
 @Controller
 @RequestMapping("/history")
 class OuterStockHistoryByDailyController(
-        val service: StockHistoryPersistenceService
+        val service: StockHistoryPersistenceService,
+        val configuration: CustomerConfiguration
 ) {
     private val historyEntities = mutableListOf<StockHistoryEntity>()
 
@@ -40,10 +42,10 @@ class OuterStockHistoryByDailyController(
 
     private fun saveHistoryEntity(entity: StockHistoryEntity) {
         historyEntities.add(entity)
-        if (historyEntities.size >= SAVE_ENTITIES_SIZE) {
+        if (historyEntities.size >= configuration.historyHandleSize) {
             saveHistories(historyEntities)
             historyEntities.clear()
-            logger.info("OuterStockHistoryByDailyController#saveHistoryEntity save $SAVE_ENTITIES_SIZE.")
+            logger.info("OuterStockHistoryByDailyController#saveHistoryEntity save ${configuration.historyHandleSize}.")
         }
     }
     @Async(value = "asyncExecutor")
@@ -74,14 +76,13 @@ class OuterStockHistoryByDailyController(
             logger.error("OuterStockHistoryByDailyController#findMaxDateByNo error", e)
         }
         return ResponseStockInfo(
-                maxDate = if (maxDate == null || maxDate == "") "20200101"
+                maxDate = if (maxDate == null || maxDate == "") configuration.startDate
                 else (maxDate.replace("-", "").toInt() + 1).toString(),
                 today = now.toString()
         )
     }
 
     companion object {
-        const val SAVE_ENTITIES_SIZE: Int = 100
         val logger: Logger = LoggerFactory.getLogger(OuterStockHistoryByDailyController::class.java)
     }
 }

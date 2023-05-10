@@ -79,3 +79,8 @@ async-task:
   awaitTerminationTime: 60
   # 线程结束前，是否等待线程队列中的任务执行完成
   waitTasksComplete: true
+
+customer:
+  config:
+    startDate: 20100101
+    historyHandleSize: 100
