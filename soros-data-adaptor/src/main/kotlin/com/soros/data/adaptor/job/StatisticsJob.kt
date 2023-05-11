@@ -35,14 +35,18 @@ class StatisticsJob(
     fun statisticsJob() {
         logger.info("hello this is statisticsJob")
         stockInfo.queryAll()?.forEach {
-            handleStatistic(it, DataTypeEnum.STOCK)
+            handleStatistic(it.code, DataTypeEnum.STOCK)
+        }
+
+        indexInfo.queryAll()?.forEach{
+            handleStatistic(it.code, DataTypeEnum.INDEX)
         }
     }
 
     @Async(value = "asyncExecutor")
-    fun handleStatistic(stockInfo: StockInfoEntity, type: DataTypeEnum) {
-        logger.info("StatisticsJob#handleStatistic start calculate ${stockInfo.code}")
-        val histories = history.findByStockNo(stockInfo.code)?.sortedBy { it.date }
+    fun handleStatistic(code: String, type: DataTypeEnum) {
+        logger.info("StatisticsJob#handleStatistic start calculate $code}")
+        val histories = history.findByStockNo(code)?.sortedBy { it.date }
         if (CollectionUtils.isEmpty(histories)) {
             return
         }
@@ -87,7 +91,7 @@ class StatisticsJob(
             historyForMonthBo.add(bo)
         }
         service.save(StockStatisticsDomainBo(
-                code = stockInfo.code,
+                code = code,
                 type = type.name,
                 macroscopicDomainBo = macroscopicDomainBoList,
                 monthDomainBo = historyForMonthBo
