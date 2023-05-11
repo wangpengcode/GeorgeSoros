@@ -6,11 +6,14 @@ import com.soros.data.adaptor.domain.bo.StockStatisticsDomainBo
 import com.soros.data.adaptor.domain.bo.StockStatisticsMacroscopicDomainBo
 import com.soros.data.adaptor.domain.bo.StockStatisticsMonthDomainBo
 import com.soros.data.adaptor.entity.StockHistoryEntity
+import com.soros.data.adaptor.entity.StockStatisticsEntity
 import com.soros.data.adaptor.enums.DataTypeEnum
+import com.soros.data.adaptor.extension.fromJson
 import com.soros.data.adaptor.service.StockHistoryPersistenceService
 import com.soros.data.adaptor.service.StockIndexPersistenceService
 import com.soros.data.adaptor.service.StockInfoPersistenceService
 import com.soros.data.adaptor.service.StockStatisticsPersistenceService
+import com.soros.data.adaptor.transformer.toStockStatisticsDomainBo
 import com.soros.data.adaptor.transformer.toStockStatisticsEntity
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -18,11 +21,13 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.util.CollectionUtils
+import org.springframework.util.StringUtils
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDateTime
 import java.util.*
 import java.util.stream.Collectors
+import kotlin.collections.HashMap
 import kotlin.streams.toList
 
 @Suppress("NOT_NULL_ASSERTION_ON_CALLABLE_REFERENCE")
@@ -35,22 +40,19 @@ class StatisticsJob(
 ) {
 
     private val cacheData = HashMap<String, MarketMacroscopicDomainBo>()
-    private  var shIndex: List<StockHistoryEntity>? = history.findByStockNo(SH_INDEX_CODE)
-    private  var szIndex: List<StockHistoryEntity>? = history.findByStockNo(SZ_INDEX_CODE)
+    private var shIndex: List<StockHistoryEntity>? = history.findByStockNo(SH_INDEX_CODE)
+    private var szIndex: List<StockHistoryEntity>? = history.findByStockNo(SZ_INDEX_CODE)
+
     @Scheduled(cron = "#{@statisticsJobCron}")
     fun statisticsHistoryJob() {
         logger.info("hello this is statisticsHistoryJob")
         stockInfo.queryAll()?.forEach {
             handleStatistic(it.code, DataTypeEnum.STOCK)
         }
-    }
-
-    @Scheduled(cron = "#{@statisticsJobCron}")
-    fun statisticsIndexJob() {
-        logger.info("hello this is statisticsIndexJob")
         indexInfo.queryAll()?.forEach {
             handleStatistic(it.code, DataTypeEnum.INDEX)
         }
+        service.queryAll()
     }
 
     @Async(value = "asyncExecutor")
@@ -114,50 +116,57 @@ class StatisticsJob(
                 monthDomainBo = historyForMonthBo
         ).toStockStatisticsEntity())
     }
-//    fun handleIndexMacroscopicEnv(date: String): MarketMacroscopicDomainBo? {
-//        val start = LocalDateTime.now().second
-//        var end: Int
-//        val data = cacheData[date]
-//        if (Objects.nonNull(data)) {
-//            logger.info("handleIndexMacroscopicEnv# get from cache with date = $date")
-//            return data
-//        } else {
-//            val dailyDomainBo = MarketMacroscopicDomainBo()
-//            stockInfo.queryAll()?.stream()?.forEach {
-//                history.findByCodeAndDate(it.code, date)?.let { outer ->
-//                    dailyDomainBo.apply {
-//                        marketTotalStock += 1
-//                        if (BigDecimal.ZERO < outer.zdAmount) {
-//                            marketProfitStock += 1
-//                        }
-//                        if (BigDecimal.ZERO > outer.zdAmount) {
-//                            marketLossStock += 1
-//                        }
-//                    }
-//                }
-//            }
-//            history.findByCodeAndDate(SH_INDEX_CODE, date)?.let { outer ->
-//                dailyDomainBo.apply {
-//                    marketShangHaiAmount = outer.zdAmount!!
-//                    marketShangHaiZdRange = outer.zdRange!!
-//                }
-//            }
-//
-//            history.findByCodeAndDate(SZ_INDEX_CODE, date)?.let { outer ->
-//                dailyDomainBo.apply {
-//                    marketShenZhenAmount = outer.zdAmount!!
-//                    marketShenZhenZdRange = outer.zdRange!!
-//                }
-//            }
-//            dailyDomainBo.apply {
-//                marketProfitRate = BigDecimal(marketProfitStock).divide(BigDecimal(marketTotalStock), SCALE_OF_SOROS, RoundingMode.HALF_EVEN)
-//            }
-//            cacheData[date] = dailyDomainBo
-//            end = LocalDateTime.now().second
-//            logger.info("handleIndexMacroscopicEnv# put cache date = $date cost = ${end - start}")
-//            return dailyDomainBo
-//        }
-//    }
+
+    fun handleMarketStock(statistics: List<StockStatisticsEntity>?) {
+        if (CollectionUtils.isEmpty(statistics)) {
+            return
+        }
+        val codeMap: Map<String, List<StockStatisticsEntity>> = statistics!!.stream().collect(Collectors.groupingBy { it.code })
+        val totalMap: MutableMap<String,Int> = HashMap()
+        val profitMap: MutableMap<String,Int> = HashMap()
+        val lossMap: MutableMap<String,Int> = HashMap()
+        for (i in codeMap) {
+            if (CollectionUtils.isEmpty(i.value)) {
+                continue
+            }
+            val usedList = i.value.stream().filter { it.type == DataTypeEnum.STOCK.name && (Objects.nonNull(it.macroscopicIndex)) }.toList()
+            if (CollectionUtils.isEmpty(usedList)) {
+                continue
+            }
+            val domainBoList = usedList.stream().map { it.macroscopicIndex!!.fromJson<StockStatisticsMacroscopicDomainBo>() }.toList()
+            for (j in domainBoList) {
+                if (totalMap[j.date] == null) {
+                    totalMap[j.date] = 1
+                } else {
+                    totalMap[j.date] = 1 + totalMap[j.date]!!
+                }
+                if (BigDecimal.ZERO < j.currentStockPrice) {
+                    if (profitMap[j.date] == null) {
+                        profitMap[j.date] = 1
+                    } else {
+                        profitMap[j.date] = 1 + profitMap[j.date]!!
+                    }
+                }
+                if (BigDecimal.ZERO > j.currentStockPrice) {
+                    if (lossMap[j.date] == null) {
+                        lossMap[j.date] = 1
+                    } else {
+                        lossMap[j.date] = 1 + lossMap[j.date]!!
+                    }
+                }
+            }
+        }
+
+        for (i in codeMap) {
+            if (CollectionUtils.isEmpty(i.value)) {
+                continue
+            }
+            val usedList = i.value.stream().filter { it.type == DataTypeEnum.STOCK.name && (Objects.nonNull(it.macroscopicIndex)) }.toList()
+            if (CollectionUtils.isEmpty(usedList)) {
+                continue
+            }
+        }
+    }
 
     companion object {
         val logger: Logger = LoggerFactory.getLogger(StatisticsJob::class.java)
