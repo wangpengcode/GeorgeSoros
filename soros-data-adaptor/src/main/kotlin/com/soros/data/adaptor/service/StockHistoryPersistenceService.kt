@@ -25,6 +25,11 @@ class StockHistoryPersistenceService(
 		return stockHistoryRepository.findByStockNo(stockNo)
 	}
 
+	fun findByCodeAndDate(code: String, date: String): StockHistoryEntity? {
+		val partitionCode = code.replace("sz", "").replace("sh", "").toLong()
+		return stockHistoryRepository.findByCodeAndDate(code,date, partitionCode)
+	}
+
 	fun findMaxDateByStockNo(stockNo: String): String? {
 		return stockHistoryRepository.findByStockNo(stockNo)?.stream()
 				?.max(Comparator.comparing(StockHistoryEntity::date))

@@ -35,4 +35,17 @@ class AsyncExecutorConfiguration {
         executor.setWaitForTasksToCompleteOnShutdown(waitTasksComplete)
         return executor
     }
+
+    @Bean
+    fun async2Executor(): Executor {
+        val executor = ThreadPoolTaskExecutor()
+        executor.corePoolSize = corePoolSize
+        executor.maxPoolSize = maximumPoolSize
+        executor.keepAliveSeconds = keepAliveSeconds
+        executor.setQueueCapacity(queueCapacity)
+        executor.setThreadNamePrefix("Async-new-Task-")
+        executor.setAwaitTerminationSeconds(awaitTerminationTime)
+        executor.setWaitForTasksToCompleteOnShutdown(waitTasksComplete)
+        return executor
+    }
 }

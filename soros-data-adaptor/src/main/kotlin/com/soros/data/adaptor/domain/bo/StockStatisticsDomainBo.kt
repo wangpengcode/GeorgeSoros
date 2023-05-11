@@ -11,6 +11,8 @@ data class StockStatisticsDomainBo(
 
 data class StockStatisticsMacroscopicDomainBo(
         var date: String,
+        var currentStockZdRange: BigDecimal = BigDecimal.ZERO,
+        var currentStockPrice: BigDecimal = BigDecimal.ZERO,
         var averagePrice: BigDecimal,
         var averageVolume: BigDecimal,
         var averageFlat: BigDecimal,
@@ -18,6 +20,25 @@ data class StockStatisticsMacroscopicDomainBo(
         var averageLoss: BigDecimal,
         var overAveragePriceIndex: BigDecimal,
         var overAverageVolumeIndex: BigDecimal,
+        var marketTotalStock: Int = 0,
+        var marketProfitStock: Int = 0,
+        var marketLossStock: Int = 0,
+        var marketProfitRate:  BigDecimal = BigDecimal.ZERO,
+        var marketShangHaiZdRange: BigDecimal = BigDecimal.ZERO,
+        var marketShangHaiAmount: BigDecimal = BigDecimal.ZERO,
+        var marketShenZhenZdRange: BigDecimal = BigDecimal.ZERO,
+        var marketShenZhenAmount: BigDecimal = BigDecimal.ZERO,
+)
+
+data class MarketMacroscopicDomainBo(
+        var marketTotalStock: Int = 0,
+        var marketProfitStock: Int = 0,
+        var marketLossStock: Int = 0,
+        var marketProfitRate: BigDecimal = BigDecimal.ZERO,
+        var marketShangHaiZdRange: BigDecimal = BigDecimal.ZERO,
+        var marketShangHaiAmount: BigDecimal = BigDecimal.ZERO,
+        var marketShenZhenZdRange: BigDecimal = BigDecimal.ZERO,
+        var marketShenZhenAmount: BigDecimal = BigDecimal.ZERO,
 )
 
 data class StockStatisticsMonthDomainBo(
@@ -29,4 +50,12 @@ data class StockStatisticsMonthDomainBo(
         var averageLoss: BigDecimal,
         var overAveragePriceIndex: BigDecimal,
         var overAverageVolumeIndex: BigDecimal,
+)
+
+data class StockStatisticsDailyDomainBo(
+        var date: String,
+        var totalStock: Int = 0,
+        var profitStock: Int = 0,
+        var lossStock: Int = 0,
+        var profitRate: BigDecimal = BigDecimal.ZERO
 )
