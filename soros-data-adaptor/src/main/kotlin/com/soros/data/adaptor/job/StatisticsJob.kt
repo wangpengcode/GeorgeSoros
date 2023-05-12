@@ -66,6 +66,7 @@ class StatisticsJob(
         if (CollectionUtils.isEmpty(histories)) {
             return
         }
+        // TODO 每次都从最原始数据算起太浪费时间,后期进行优化
         val macroscopicDomainBoList = mutableListOf<StockStatisticsMacroscopicDomainBo>()
         for (h in histories!!) {
             val preHistory = histories.filter { it.date < h.date && (it.close != null) }
