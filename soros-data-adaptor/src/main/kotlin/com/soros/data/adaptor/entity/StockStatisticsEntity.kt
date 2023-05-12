@@ -15,8 +15,8 @@ data class StockStatisticsEntity(
         val type: String,
 
         @Column(name = "macroscopic_index")
-        val macroscopicIndex: String? = null,
+        var macroscopicIndex: String? = null,
 
         @Column(name = "macroscopic_month_index")
-        val macroscopicMonthIndex: String? = null,
+        var macroscopicMonthIndex: String? = null,
 )

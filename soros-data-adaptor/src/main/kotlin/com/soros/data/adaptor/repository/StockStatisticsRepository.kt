@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository
 
 interface StockStatisticsRepository : CrudRepository<StockStatisticsEntity, String> {
 	@Query("FROM StockStatisticsEntity a where a.code= ?1")
-	fun findByStockNo(code: String): StockStatisticsEntity
+	fun findByStockNo(code: String): StockStatisticsEntity?
 }

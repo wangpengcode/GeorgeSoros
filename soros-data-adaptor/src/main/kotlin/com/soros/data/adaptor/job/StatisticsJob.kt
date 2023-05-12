@@ -1,19 +1,18 @@
 package com.soros.data.adaptor.job
 
 import com.soros.data.adaptor.common.Commons.Companion.SCALE_OF_SOROS
-import com.soros.data.adaptor.domain.bo.MarketMacroscopicDomainBo
 import com.soros.data.adaptor.domain.bo.StockStatisticsDomainBo
 import com.soros.data.adaptor.domain.bo.StockStatisticsMacroscopicDomainBo
 import com.soros.data.adaptor.domain.bo.StockStatisticsMonthDomainBo
 import com.soros.data.adaptor.entity.StockHistoryEntity
 import com.soros.data.adaptor.entity.StockStatisticsEntity
 import com.soros.data.adaptor.enums.DataTypeEnum
-import com.soros.data.adaptor.extension.fromJson
+import com.soros.data.adaptor.extension.fromListJson
+import com.soros.data.adaptor.extension.toJson
 import com.soros.data.adaptor.service.StockHistoryPersistenceService
 import com.soros.data.adaptor.service.StockIndexPersistenceService
 import com.soros.data.adaptor.service.StockInfoPersistenceService
 import com.soros.data.adaptor.service.StockStatisticsPersistenceService
-import com.soros.data.adaptor.transformer.toStockStatisticsDomainBo
 import com.soros.data.adaptor.transformer.toStockStatisticsEntity
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -26,8 +25,8 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDateTime
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Collectors
-import kotlin.collections.HashMap
 import kotlin.streams.toList
 
 @Suppress("NOT_NULL_ASSERTION_ON_CALLABLE_REFERENCE")
@@ -39,9 +38,11 @@ class StatisticsJob(
         val history: StockHistoryPersistenceService
 ) {
 
-    private val cacheData = HashMap<String, MarketMacroscopicDomainBo>()
     private var shIndex: List<StockHistoryEntity>? = history.findByStockNo(SH_INDEX_CODE)
     private var szIndex: List<StockHistoryEntity>? = history.findByStockNo(SZ_INDEX_CODE)
+    private val totalMap: MutableMap<String, Int> = ConcurrentHashMap()
+    private val profitMap: MutableMap<String, Int> = ConcurrentHashMap()
+    private val lossMap: MutableMap<String, Int> = ConcurrentHashMap()
 
     @Scheduled(cron = "#{@statisticsJobCron}")
     fun statisticsHistoryJob() {
@@ -52,7 +53,9 @@ class StatisticsJob(
         indexInfo.queryAll()?.forEach {
             handleStatistic(it.code, DataTypeEnum.INDEX)
         }
-        service.queryAll()
+        stockInfo.queryAll()?.forEach {
+            service.findByStockNo(it.code)?.let { it -> handleMarketStock(it) }
+        }
     }
 
     @Async(value = "asyncExecutor")
@@ -91,6 +94,25 @@ class StatisticsJob(
                     marketShenZhenZdRange = if (CollectionUtils.isEmpty(szIndex)) BigDecimal.ZERO else szIndex!!.filter { it.date == h.date }.map { it.zdRange!! }[0],
             )
             macroscopicDomainBoList.add(macroscopicDomainBo)
+            if (totalMap[h.date] == null) {
+                totalMap[h.date] = 1
+            } else {
+                totalMap[h.date] = 1 + totalMap[h.date]!!
+            }
+            if (BigDecimal.ZERO < macroscopicDomainBo.currentStockPrice) {
+                if (profitMap[h.date] == null) {
+                    profitMap[h.date] = 1
+                } else {
+                    profitMap[h.date] = 1 + profitMap[h.date]!!
+                }
+            }
+            if (BigDecimal.ZERO > macroscopicDomainBo.currentStockPrice) {
+                if (lossMap[h.date] == null) {
+                    lossMap[h.date] = 1
+                } else {
+                    lossMap[h.date] = 1 + lossMap[h.date]!!
+                }
+            }
         }
         val historyForMonth = histories.stream().map { it.apply { date = date.substring(5, 7) } }.collect(Collectors.groupingBy { it.date })
         val historyForMonthBo = mutableListOf<StockStatisticsMonthDomainBo>()
@@ -117,55 +139,22 @@ class StatisticsJob(
         ).toStockStatisticsEntity())
     }
 
-    fun handleMarketStock(statistics: List<StockStatisticsEntity>?) {
-        if (CollectionUtils.isEmpty(statistics)) {
+    fun handleMarketStock(statistics: StockStatisticsEntity) {
+        if (StringUtils.isEmpty(statistics.macroscopicIndex)) {
             return
         }
-        val codeMap: Map<String, List<StockStatisticsEntity>> = statistics!!.stream().collect(Collectors.groupingBy { it.code })
-        val totalMap: MutableMap<String,Int> = HashMap()
-        val profitMap: MutableMap<String,Int> = HashMap()
-        val lossMap: MutableMap<String,Int> = HashMap()
-        for (i in codeMap) {
-            if (CollectionUtils.isEmpty(i.value)) {
-                continue
-            }
-            val usedList = i.value.stream().filter { it.type == DataTypeEnum.STOCK.name && (Objects.nonNull(it.macroscopicIndex)) }.toList()
-            if (CollectionUtils.isEmpty(usedList)) {
-                continue
-            }
-            val domainBoList = usedList.stream().map { it.macroscopicIndex!!.fromJson<StockStatisticsMacroscopicDomainBo>() }.toList()
-            for (j in domainBoList) {
-                if (totalMap[j.date] == null) {
-                    totalMap[j.date] = 1
-                } else {
-                    totalMap[j.date] = 1 + totalMap[j.date]!!
-                }
-                if (BigDecimal.ZERO < j.currentStockPrice) {
-                    if (profitMap[j.date] == null) {
-                        profitMap[j.date] = 1
-                    } else {
-                        profitMap[j.date] = 1 + profitMap[j.date]!!
-                    }
-                }
-                if (BigDecimal.ZERO > j.currentStockPrice) {
-                    if (lossMap[j.date] == null) {
-                        lossMap[j.date] = 1
-                    } else {
-                        lossMap[j.date] = 1 + lossMap[j.date]!!
-                    }
-                }
-            }
-        }
+        val rawList: List<StockStatisticsMacroscopicDomainBo> = statistics.macroscopicMonthIndex!!.fromListJson(StockStatisticsMacroscopicDomainBo::class.java)
+        val newList = rawList.stream().map { it3 ->
+            it3.marketTotalStock = if (Objects.nonNull(totalMap[it3.date])) totalMap[it3.date]!! else 0
+            it3.marketLossStock = if (Objects.nonNull(lossMap[it3.date])) lossMap[it3.date]!! else 0
+            it3.marketProfitStock = if (Objects.nonNull(profitMap[it3.date])) profitMap[it3.date]!! else 0
+            it3.marketProfitRate = BigDecimal(it3.marketProfitStock).divide(BigDecimal(it3.marketTotalStock), SCALE_OF_SOROS, RoundingMode.HALF_EVEN)
+        }.toList()
 
-        for (i in codeMap) {
-            if (CollectionUtils.isEmpty(i.value)) {
-                continue
-            }
-            val usedList = i.value.stream().filter { it.type == DataTypeEnum.STOCK.name && (Objects.nonNull(it.macroscopicIndex)) }.toList()
-            if (CollectionUtils.isEmpty(usedList)) {
-                continue
-            }
+        statistics.apply {
+            macroscopicMonthIndex = newList.toJson()
         }
+        service.save(statistics)
     }
 
     companion object {
