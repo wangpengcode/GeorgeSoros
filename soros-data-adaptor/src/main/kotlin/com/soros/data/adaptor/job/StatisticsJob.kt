@@ -100,14 +100,14 @@ class StatisticsJob(
             } else {
                 totalMap[h.date] = 1 + totalMap[h.date]!!
             }
-            if (BigDecimal.ZERO < macroscopicDomainBo.currentStockPrice) {
+            if (BigDecimal.ZERO < macroscopicDomainBo.currentStockZdRange) {
                 if (profitMap[h.date] == null) {
                     profitMap[h.date] = 1
                 } else {
                     profitMap[h.date] = 1 + profitMap[h.date]!!
                 }
             }
-            if (BigDecimal.ZERO > macroscopicDomainBo.currentStockPrice) {
+            if (BigDecimal.ZERO > macroscopicDomainBo.currentStockZdRange) {
                 if (lossMap[h.date] == null) {
                     lossMap[h.date] = 1
                 } else {
@@ -147,10 +147,10 @@ class StatisticsJob(
         }
         val rawList: List<StockStatisticsMacroscopicDomainBo> = statistics.macroscopicMonthIndex!!.fromListJson(StockStatisticsMacroscopicDomainBo::class.java)
         val newList = rawList.stream().map { it3 ->
-            it3.marketTotalStock = if (Objects.nonNull(totalMap[it3.date])) totalMap[it3.date]!! else 0
-            it3.marketLossStock = if (Objects.nonNull(lossMap[it3.date])) lossMap[it3.date]!! else 0
-            it3.marketProfitStock = if (Objects.nonNull(profitMap[it3.date])) profitMap[it3.date]!! else 0
-            it3.marketProfitRate = BigDecimal(it3.marketProfitStock).divide(BigDecimal(it3.marketTotalStock), SCALE_OF_SOROS, RoundingMode.HALF_EVEN).stripTrailingZeros()
+            it3.marketTotalStock = totalMap[it3.date]?.or(0)!!
+            it3.marketLossStock =  lossMap[it3.date]?.or(0)!!
+            it3.marketProfitStock = profitMap[it3.date]?.or(0)!!
+            it3.marketProfitRate = BigDecimal(profitMap[it3.date]?.or(0)!!).divide(BigDecimal(totalMap[it3.date]?.or(0)!!), SCALE_OF_SOROS, RoundingMode.HALF_EVEN).stripTrailingZeros()
         }.toList()
 
         statistics.apply {
