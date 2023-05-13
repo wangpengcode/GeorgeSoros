@@ -48,20 +48,32 @@ class StatisticsJob(
     fun statisticsHistoryJob() {
         logger.info("hello this is statisticsHistoryJob")
         stockInfo.queryAll()?.forEach {
-            handleStatistic(it.code, DataTypeEnum.STOCK)
+            try {
+                handleStatistic(it.code, DataTypeEnum.STOCK)
+            } catch (e: Exception) {
+                logger.error("statisticsHistoryJob# stock code = {} with error:", it.code, e)
+            }
         }
         indexInfo.queryAll()?.forEach {
-            handleStatistic(it.code, DataTypeEnum.INDEX)
+            try {
+                handleStatistic(it.code, DataTypeEnum.INDEX)
+            } catch (e: Exception) {
+                logger.error("statisticsHistoryJob# index code = {} with error:", it.code, e)
+            }
         }
         stockInfo.queryAll()?.forEach {
-            service.findByStockNo(it.code)?.let { it -> handleMarketStock(it) }
+            try {
+                service.findByStockNo(it.code)?.let { handleMarketStock(it) }
+            } catch (e: Exception) {
+                logger.error("statisticsHistoryJob# handleMarketStock code = {} with error:", it.code, e)
+            }
         }
     }
 
     @Async(value = "asyncExecutor")
     fun handleStatistic(code: String, type: DataTypeEnum) {
         val start = LocalDateTime.now().second
-        logger.info("StatisticsJob#handleStatistic start calculate $code}")
+        logger.info("StatisticsJob#handleStatistic start calculate $code")
         val histories = history.findByStockNo(code)?.sortedBy { it.date }
         if (CollectionUtils.isEmpty(histories)) {
             return
@@ -148,7 +160,7 @@ class StatisticsJob(
         val rawList: List<StockStatisticsMacroscopicDomainBo> = statistics.macroscopicMonthIndex!!.fromListJson(StockStatisticsMacroscopicDomainBo::class.java)
         val newList = rawList.stream().map { it3 ->
             it3.marketTotalStock = totalMap[it3.date]?.or(0)!!
-            it3.marketLossStock =  lossMap[it3.date]?.or(0)!!
+            it3.marketLossStock = lossMap[it3.date]?.or(0)!!
             it3.marketProfitStock = profitMap[it3.date]?.or(0)!!
             it3.marketProfitRate = BigDecimal(profitMap[it3.date]?.or(0)!!).divide(BigDecimal(totalMap[it3.date]?.or(0)!!), SCALE_OF_SOROS, RoundingMode.HALF_EVEN).stripTrailingZeros()
         }.toList()
