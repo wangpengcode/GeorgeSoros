@@ -84,3 +84,11 @@ customer:
   config:
     startDate: 20100101
     historyHandleSize: 100
+
+wave:
+  config:
+    waveJobCron: 0 10 18,22 * * ?
+    range: 0.5
+    multiWaveInterval: 44
+    inflectionPointDays: 10
+    minInflectionPointDays: 6
