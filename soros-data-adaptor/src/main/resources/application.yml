@@ -51,8 +51,8 @@ spring:
       sql-show: false
 schedule:
   job:
-    statisticsJobCron: 0 10 18,22 * * ?
-    statisticsJobCronSwitch: OFF
+    statisticsJobCron: 0 17 19,22 * * ?
+    statisticsJobCronSwitch: "OFF"
 #  datasource:
 #    driver-class-name: com.mysql.jdbc.Driver
 #    hikari:
