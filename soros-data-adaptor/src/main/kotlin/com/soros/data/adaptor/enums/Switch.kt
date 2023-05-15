@@ -6,11 +6,11 @@ enum class Switch {
 
     companion object {
         fun isSwitchOn(switch: String): Boolean {
-            return ON.name == switch
+            return ON.name.equals(switch, ignoreCase = true)
         }
 
         fun isSwitchOff(switch: String): Boolean {
-            return OFF.name == switch
+            return OFF.name.equals(switch, ignoreCase = true)
         }
     }
 }
