@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration
 class JobConfiguration {
     var statisticsJobCron: String = " 0 38 17,21,8 * * ?"
 
+    var statisticsJobCronSwitch: String = "OFF"
     @Bean
     fun statisticsJobCron(): String {
         return statisticsJobCron

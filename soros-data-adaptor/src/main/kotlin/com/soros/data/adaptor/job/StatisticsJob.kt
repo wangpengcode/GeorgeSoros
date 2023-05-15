@@ -1,12 +1,14 @@
 package com.soros.data.adaptor.job
 
 import com.soros.data.adaptor.common.Commons.Companion.SCALE_OF_SOROS
+import com.soros.data.adaptor.config.JobConfiguration
 import com.soros.data.adaptor.domain.bo.StockStatisticsDomainBo
 import com.soros.data.adaptor.domain.bo.StockStatisticsMacroscopicDomainBo
 import com.soros.data.adaptor.domain.bo.StockStatisticsMonthDomainBo
 import com.soros.data.adaptor.entity.StockHistoryEntity
 import com.soros.data.adaptor.entity.StockStatisticsEntity
 import com.soros.data.adaptor.enums.DataTypeEnum
+import com.soros.data.adaptor.enums.Switch
 import com.soros.data.adaptor.extension.fromListJson
 import com.soros.data.adaptor.extension.toJson
 import com.soros.data.adaptor.service.StockHistoryPersistenceService
@@ -35,7 +37,8 @@ class StatisticsJob(
         val service: StockStatisticsPersistenceService,
         val stockInfo: StockInfoPersistenceService,
         val indexInfo: StockIndexPersistenceService,
-        val history: StockHistoryPersistenceService
+        val history: StockHistoryPersistenceService,
+        val jobConfiguration: JobConfiguration
 ) {
 
     private var shIndex: List<StockHistoryEntity>? = history.findByStockNo(SH_INDEX_CODE)
@@ -46,6 +49,10 @@ class StatisticsJob(
 
     @Scheduled(cron = "#{@statisticsJobCron}")
     fun statisticsHistoryJob() {
+        if (Switch.isSwitchOff(jobConfiguration.statisticsJobCronSwitch)){
+            logger.info("statisticsHistoryJob# switch off")
+            return
+        }
         logger.info("hello this is statisticsHistoryJob")
         stockInfo.queryAll()?.forEach {
             try {
