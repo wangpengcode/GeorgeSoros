@@ -49,7 +49,7 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
             endAmend = 0
             result.add(inflection!!)
         } else {
-            endAmend += inflectionPointDays
+            endAmend += 2
             continue
         }
         start = end + 1
