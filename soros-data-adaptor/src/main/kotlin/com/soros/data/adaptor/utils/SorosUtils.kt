@@ -45,6 +45,33 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
                     type = TrendInflectionPointType.MIN
             )
         }
+
+        if (max.date == endDay.date) {
+            val lastMax = sortedList.subList(end, end + 3).stream().max(Comparator.comparing(StockWaveBo::high)).get()
+            if (lastMax.high < max.high) {
+                inflection = InflectionPoint(
+                        code = max.code,
+                        date = max.date,
+                        close = max.close,
+                        high = max.high,
+                        type = TrendInflectionPointType.MAX
+                )
+            }
+        }
+
+        if (min.date == endDay.date) {
+            val lastLow = sortedList.subList(end, end + 3).stream().max(Comparator.comparing(StockWaveBo::low)).get()
+            if (lastLow.low > min.low) {
+                inflection = InflectionPoint(
+                        code = min.code,
+                        close = min.close,
+                        date = min.date,
+                        low = min.low,
+                        type = TrendInflectionPointType.MIN
+                )
+            }
+        }
+
         if (Objects.nonNull(inflection)) {
             endAmend = 0
             result.add(inflection!!)
