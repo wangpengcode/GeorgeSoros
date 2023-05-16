@@ -1,6 +1,7 @@
 package com.soros.data.adaptor.transformer
 
 import com.soros.data.adaptor.domain.bo.StockStatisticsDomainBo
+import com.soros.data.adaptor.domain.bo.StockWaveBo
 import com.soros.data.adaptor.dto.request.StockDailyDataDto
 import com.soros.data.adaptor.dto.request.StockIndex
 import com.soros.data.adaptor.dto.request.StockInfo
@@ -63,5 +64,13 @@ fun StockStatisticsEntity.toStockStatisticsDomainBo() : StockStatisticsDomainBo 
             type = this.type,
             macroscopicDomainBo = this.macroscopicIndex?.fromJson(),
             monthDomainBo = this.macroscopicMonthIndex?.fromJson()
+    )
+}
+
+fun StockHistoryEntity.toStockWaveBo(): StockWaveBo {
+    return StockWaveBo(
+            code = this.code,
+            date = this.date,
+            close = this.close!!
     )
 }

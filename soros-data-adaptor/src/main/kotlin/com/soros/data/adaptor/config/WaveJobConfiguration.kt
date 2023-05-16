@@ -14,7 +14,7 @@ class WaveJobConfiguration {
 
     var multiWaveInterval = 44
 
-    var inflectionPointDays = 10
+    var inflectionPointDays = 20
 
     var minInflectionPointDays = 6
 
