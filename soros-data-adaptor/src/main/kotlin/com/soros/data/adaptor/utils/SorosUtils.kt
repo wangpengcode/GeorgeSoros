@@ -17,19 +17,22 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
     val result = mutableListOf<InflectionPoint>(InflectionPoint(code = sortedList[0].code, date = sortedList[0].date, close = sortedList[0].close, type = TrendInflectionPointType.MAX))
     var start = 0
     var end = 0
+    var endAmend = 0 // 终点修正
     while (start < sortedList.size - 2 * inflectionPointDays) {
-        end = start + inflectionPointDays
+        end = start + inflectionPointDays + endAmend
         val currentSegment = sortedList.subList(start, end)
         val startDay = currentSegment[0]
         val endDay = currentSegment[currentSegment.size - 1]
-        val max = currentSegment.stream().max(Comparator.comparing(StockWaveBo::close)).get()
-        val min = currentSegment.stream().min(Comparator.comparing(StockWaveBo::close)).get()
+        val max = currentSegment.stream().max(Comparator.comparing(StockWaveBo::high)).get()
+        val min = currentSegment.stream().min(Comparator.comparing(StockWaveBo::low)).get()
         var inflection: InflectionPoint? = null
         if (max.date != startDay.date && max.date != endDay.date) {
+
             inflection = InflectionPoint(
                     code = max.code,
                     date = max.date,
                     close = max.close,
+                    high = max.high,
                     type = TrendInflectionPointType.MAX
             )
         }
@@ -38,13 +41,15 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
                     code = min.code,
                     date = min.date,
                     close = min.close,
+                    low = min.low,
                     type = TrendInflectionPointType.MIN
             )
         }
         if (Objects.nonNull(inflection)) {
+            endAmend = 0
             result.add(inflection!!)
         } else {
-            start = end
+            endAmend += inflectionPointDays
             continue
         }
         start = end + 1

@@ -71,6 +71,8 @@ fun StockHistoryEntity.toStockWaveBo(): StockWaveBo {
     return StockWaveBo(
             code = this.code,
             date = this.date,
-            close = this.close!!
+            close = this.close!!,
+            high = this.high!!,
+            low = this.low!!
     )
 }

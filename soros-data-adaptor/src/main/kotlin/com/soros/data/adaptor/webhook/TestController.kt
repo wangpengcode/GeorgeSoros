@@ -18,6 +18,6 @@ class TestController(val history: StockHistoryPersistenceService, val info: Stoc
     @ResponseBody
     fun testWave(): List<InflectionPoint>? {
         val histories = history.findByStockNo("000001")
-        return histories?.map { it.toStockWaveBo() }?.findInflectionPoint(4)
+        return histories?.map { it.toStockWaveBo() }?.findInflectionPoint(6)
     }
 }

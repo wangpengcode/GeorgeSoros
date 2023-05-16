@@ -7,6 +7,8 @@ import java.math.BigDecimal
 data class StockWaveBo(
         val code: String,
         var close: BigDecimal,
+        var high: BigDecimal,
+        var low: BigDecimal,
         var date: String
 )
 
@@ -14,6 +16,8 @@ data class InflectionPoint(
         val code: String,
         var date: String,
         var close: BigDecimal,
+        var high: BigDecimal? =null,
+        var low: BigDecimal? = null,
         var type: TrendInflectionPointType
 )
 
