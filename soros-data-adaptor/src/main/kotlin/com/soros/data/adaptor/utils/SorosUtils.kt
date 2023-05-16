@@ -1,7 +1,6 @@
 package com.soros.data.adaptor.utils
 
 import com.soros.data.adaptor.domain.bo.InflectionPoint
-import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
 import com.soros.data.adaptor.domain.bo.StockWaveBo
 import com.soros.data.adaptor.domain.bo.StockWaveSingleBo
 import com.soros.data.adaptor.enums.TrendInflectionPointType
