@@ -1,7 +1,8 @@
 package com.soros.data.adaptor.domain.bo
 
 import com.soros.data.adaptor.enums.TrendInflectionPointType
-import com.soros.data.adaptor.enums.WaveTypeEnum
+import com.soros.data.adaptor.enums.TrendMultiType
+import com.soros.data.adaptor.enums.WaveDirectionEnum
 import java.math.BigDecimal
 
 data class StockWaveBo(
@@ -21,10 +22,22 @@ data class InflectionPoint(
         var type: TrendInflectionPointType
 )
 
+data class StockTrendWaveBo(
+        var waveDirectionEnum: WaveDirectionEnum,
+        var startWaveBo: StockWaveBo,
+        var endWaveBo: StockWaveBo,
+        var lastDays: Int,
+        var range: BigDecimal,
+        var trendMultiType: TrendMultiType,
+        var code: String,
+        var startInflectionPoint: InflectionPoint,
+        var endInflectionPoint: InflectionPoint
+)
+
 data class StockWaveSingleBo(
-    var waveTypeEnum: WaveTypeEnum,
-    var inflectionPointType: TrendInflectionPointType? = null,
-    var inflectionPoint: StockWaveBo? = null,
-    var maxPoint: StockWaveBo,
-    var minPoint: StockWaveBo
+        var waveDirectionEnum: WaveDirectionEnum,
+        var inflectionPointType: TrendInflectionPointType? = null,
+        var inflectionPoint: StockWaveBo? = null,
+        var maxPoint: StockWaveBo,
+        var minPoint: StockWaveBo
 )

@@ -5,6 +5,7 @@ import com.soros.data.adaptor.service.StockHistoryPersistenceService
 import com.soros.data.adaptor.service.StockInfoPersistenceService
 import com.soros.data.adaptor.transformer.toStockWaveBo
 import com.soros.data.adaptor.utils.findInflectionPoint
+import com.soros.data.adaptor.utils.merge
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
@@ -18,6 +19,6 @@ class TestController(val history: StockHistoryPersistenceService, val info: Stoc
     @ResponseBody
     fun testWave(): List<InflectionPoint>? {
         val histories = history.findByStockNo("000001")
-        return histories?.map { it.toStockWaveBo() }?.findInflectionPoint(6)
+        return histories?.map { it.toStockWaveBo() }?.findInflectionPoint(6)?.merge()
     }
 }

@@ -1,12 +1,37 @@
 package com.soros.data.adaptor.utils
 
 import com.soros.data.adaptor.domain.bo.InflectionPoint
+import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
 import com.soros.data.adaptor.domain.bo.StockWaveBo
 import com.soros.data.adaptor.domain.bo.StockWaveSingleBo
 import com.soros.data.adaptor.enums.TrendInflectionPointType
-import com.soros.data.adaptor.enums.WaveTypeEnum
+import com.soros.data.adaptor.enums.WaveDirectionEnum
 import org.springframework.util.CollectionUtils
 import java.util.*
+
+
+fun List<InflectionPoint>.merge(): List<InflectionPoint>? {
+    if (CollectionUtils.isEmpty(this)) {
+        return null
+    }
+    var result = mutableListOf<InflectionPoint>()
+    var current = 0
+    var last = 0
+    while (last < this.size - 1) {
+        last = current + 1
+        val currentPoint = this[current]
+        val lastPoint = this[current]
+        if (currentPoint.type == lastPoint.type) {
+            result.add(lastPoint)
+            current = last + 1
+            continue
+        } else {
+            result.add(currentPoint)
+            current++
+        }
+    }
+    return result
+}
 
 
 fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<InflectionPoint>? {
@@ -100,9 +125,9 @@ fun List<StockWaveBo>.getStockWaveSingleBo(inflectionPointDays: Int): List<Stock
             break
         }
         // 两个相反方向趋势,无拐点,则两个趋势的交汇点即为拐点
-        if (Objects.nonNull(preWaveBo) && (bo!!.hasNoInflection() && preWaveBo!!.hasNoInflection() && bo.waveTypeEnum != preWaveBo.waveTypeEnum)) {
+        if (Objects.nonNull(preWaveBo) && (bo!!.hasNoInflection() && preWaveBo!!.hasNoInflection() && bo.waveDirectionEnum != preWaveBo.waveDirectionEnum)) {
             preWaveBo.inflectionPoint = preWaveBo.maxPoint
-            if (preWaveBo.waveTypeEnum == WaveTypeEnum.FALL) {
+            if (preWaveBo.waveDirectionEnum == WaveDirectionEnum.FALL) {
                 preWaveBo.inflectionPointType = TrendInflectionPointType.MIN
             } else {
                 preWaveBo.inflectionPointType = TrendInflectionPointType.MAX
@@ -113,7 +138,7 @@ fun List<StockWaveBo>.getStockWaveSingleBo(inflectionPointDays: Int): List<Stock
             continue
         }
         // 两个相同方向趋势,无拐点进行叠加
-        if (Objects.nonNull(preWaveBo) && (bo!!.hasNoInflection() && preWaveBo!!.hasNoInflection() && bo.waveTypeEnum == preWaveBo.waveTypeEnum)) {
+        if (Objects.nonNull(preWaveBo) && (bo!!.hasNoInflection() && preWaveBo!!.hasNoInflection() && bo.waveDirectionEnum == preWaveBo.waveDirectionEnum)) {
             bo = mergeSameWaveSingleBo(preWaveBo, bo)
         }
 
@@ -129,7 +154,7 @@ fun StockWaveSingleBo.hasNoInflection(): Boolean {
 
 fun mergeSameWaveSingleBo(start: StockWaveSingleBo, end: StockWaveSingleBo): StockWaveSingleBo {
     return StockWaveSingleBo(
-            waveTypeEnum = start.waveTypeEnum,
+            waveDirectionEnum = start.waveDirectionEnum,
             maxPoint = end.maxPoint,
             minPoint = start.minPoint
     )
