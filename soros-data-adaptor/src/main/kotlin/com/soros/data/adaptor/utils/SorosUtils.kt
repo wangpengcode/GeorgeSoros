@@ -1,6 +1,7 @@
 package com.soros.data.adaptor.utils
 
 import com.soros.data.adaptor.domain.bo.InflectionPoint
+import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
 import com.soros.data.adaptor.domain.bo.StockWaveBo
 import com.soros.data.adaptor.domain.bo.StockWaveSingleBo
 import com.soros.data.adaptor.enums.TrendInflectionPointType
@@ -9,6 +10,23 @@ import org.springframework.util.CollectionUtils
 import java.util.*
 
 
+fun List<InflectionPoint>.trend(): List<StockTrendWaveBo>? {
+    if (CollectionUtils.isEmpty(this)) {
+        return null
+    }
+    return null
+
+
+
+
+
+
+
+}
+
+/**
+ * 合并
+ * **/
 fun List<InflectionPoint>.merge(): List<InflectionPoint>? {
     if (CollectionUtils.isEmpty(this)) {
         return null
@@ -32,7 +50,9 @@ fun List<InflectionPoint>.merge(): List<InflectionPoint>? {
     return result
 }
 
-
+/**
+ * 拐点
+ */
 fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<InflectionPoint>? {
     if (CollectionUtils.isEmpty(this) || this.size < 2 * inflectionPointDays + 1) {
         return null
