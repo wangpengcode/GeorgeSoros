@@ -10,6 +10,13 @@ data class StockWaveBo(
         var date: String
 )
 
+data class InflectionPoint(
+        val code: String,
+        var date: String,
+        var close: BigDecimal,
+        var type: TrendInflectionPointType
+)
+
 data class StockWaveSingleBo(
     var waveTypeEnum: WaveTypeEnum,
     var inflectionPointType: TrendInflectionPointType? = null,
