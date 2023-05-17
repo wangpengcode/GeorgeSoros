@@ -17,11 +17,6 @@ fun List<InflectionPoint>.trend(): List<StockTrendWaveBo>? {
     return null
 
 
-
-
-
-
-
 }
 
 /**
@@ -39,8 +34,13 @@ fun List<InflectionPoint>.merge(): List<InflectionPoint>? {
         val currentPoint = this[current]
         val lastPoint = this[last]
         if (currentPoint.type == lastPoint.type) {
-//            result.add(lastPoint)
-            current ++
+            if (currentPoint.type == TrendInflectionPointType.MIN && (currentPoint.low!! < lastPoint.low)) {
+                result.add(currentPoint)
+            }
+            if (currentPoint.type == TrendInflectionPointType.MAX && (currentPoint.high != null) && (currentPoint.high!! > lastPoint.high)) {
+                result.add(currentPoint)
+            }
+            current++
             continue
         } else {
             result.add(currentPoint)
