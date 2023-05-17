@@ -168,7 +168,7 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
             }
         }
 
-        if (min.date == startDay.date) {
+        if (min.date == startDay.date && start > 3) {
             val beforeLow = sortedList.subList(start -3, start).stream().max(Comparator.comparing(StockWaveBo::low)).get()
             if (beforeLow.low > min.low) {
                 minInflection = InflectionPoint(
