@@ -37,10 +37,10 @@ fun List<InflectionPoint>.merge(): List<InflectionPoint>? {
     while (last < this.size - 1) {
         last = current + 1
         val currentPoint = this[current]
-        val lastPoint = this[current]
+        val lastPoint = this[last]
         if (currentPoint.type == lastPoint.type) {
-            result.add(lastPoint)
-            current = last + 1
+//            result.add(lastPoint)
+            current ++
             continue
         } else {
             result.add(currentPoint)
