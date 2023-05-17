@@ -9,7 +9,10 @@ import com.soros.data.adaptor.enums.WaveDirectionEnum
 import org.springframework.util.CollectionUtils
 import java.util.*
 
-
+/***
+ * 下降趋势,随之而来的高点逐步降低,低点越来越低
+ * 上升趋势,随之而来低高点逐步提升,低点越来越高
+ */
 fun List<InflectionPoint>.trend(): List<StockTrendWaveBo>? {
     if (CollectionUtils.isEmpty(this)) {
         return null
@@ -19,8 +22,41 @@ fun List<InflectionPoint>.trend(): List<StockTrendWaveBo>? {
 
 }
 
+
+fun List<InflectionPoint>.findPeekAndValley(): List<InflectionPoint>? {
+    if (CollectionUtils.isEmpty(this)) {
+        return null
+    }
+    val rawPeeks = this.filter { it.type == TrendInflectionPointType.MAX }.sortedBy { it.date }
+    var i = 1
+    val peeks = mutableListOf<InflectionPoint>()
+    peeks.add(rawPeeks[0])
+
+    while (i < rawPeeks.size - 2) {
+        if ((rawPeeks[i].high!! > rawPeeks[i-1].high) && rawPeeks[i].high!! > rawPeeks[i+1].high) {
+            peeks.add(rawPeeks[i])
+        }
+        i++
+    }
+
+    val valleyList = this.filter { it.type == TrendInflectionPointType.MIN }.sortedBy { it.date }
+    i = 1
+    val valleys = mutableListOf<InflectionPoint>()
+    valleys.add(valleyList[0])
+
+    while (i < valleyList.size - 2) {
+        if ((valleyList[i].low!! < valleyList[i-1].low) && valleyList[i].low!! < valleyList[i+1].low) {
+            peeks.add(valleyList[i])
+        }
+        i++
+    }
+
+    val newList = peeks + valleys
+    return newList.sortedBy { it.date }
+}
+
 /**
- * 合并
+ * 合并; 测试正确
  * **/
 fun List<InflectionPoint>.merge(): List<InflectionPoint>? {
     if (CollectionUtils.isEmpty(this)) {
@@ -52,7 +88,7 @@ fun List<InflectionPoint>.merge(): List<InflectionPoint>? {
 }
 
 /**
- * 拐点
+ * 拐点,在某一小区间内的极值点定义为拐点,测试正确
  */
 fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<InflectionPoint>? {
     if (CollectionUtils.isEmpty(this) || this.size < 2 * inflectionPointDays + 1) {
@@ -106,9 +142,35 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
             }
         }
 
+        if (max.date == startDay.date) {
+            val lastMax = sortedList.subList(start - 3, start).stream().max(Comparator.comparing(StockWaveBo::high)).get()
+            if (lastMax.high < max.high) {
+                maxInflection = InflectionPoint(
+                        code = max.code,
+                        date = max.date,
+                        close = max.close,
+                        high = max.high,
+                        type = TrendInflectionPointType.MAX
+                )
+            }
+        }
+
         if (min.date == endDay.date) {
             val lastLow = sortedList.subList(end, end + 3).stream().max(Comparator.comparing(StockWaveBo::low)).get()
             if (lastLow.low > min.low) {
+                minInflection = InflectionPoint(
+                        code = min.code,
+                        close = min.close,
+                        date = min.date,
+                        low = min.low,
+                        type = TrendInflectionPointType.MIN
+                )
+            }
+        }
+
+        if (min.date == startDay.date) {
+            val beforeLow = sortedList.subList(start -3, start).stream().max(Comparator.comparing(StockWaveBo::low)).get()
+            if (beforeLow.low > min.low) {
                 minInflection = InflectionPoint(
                         code = min.code,
                         close = min.close,
@@ -127,7 +189,7 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
             endAmend += 2
             continue
         }
-        start = end + 1
+        start = end
     }
     return result
 }
