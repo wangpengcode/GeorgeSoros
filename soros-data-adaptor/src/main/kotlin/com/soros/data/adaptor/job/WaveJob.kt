@@ -34,7 +34,7 @@ class WaveJob(
         }
     }
 
-    @Async(value = "async2Executor")
+//    @Async(value = "async2Executor")
     fun handleHistoryWave(code: String, type: DataTypeEnum) {
         try {
             logger.info("#handleHistoryWave with code {}", code)

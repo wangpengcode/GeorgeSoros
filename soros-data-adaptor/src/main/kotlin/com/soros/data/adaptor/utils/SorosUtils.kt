@@ -13,13 +13,11 @@ import java.util.*
  * 下降趋势,随之而来的高点逐步降低,低点越来越低
  * 上升趋势,随之而来低高点逐步提升,低点越来越高
  */
-fun List<InflectionPoint>.trend(): List<StockTrendWaveBo>? {
-    if (CollectionUtils.isEmpty(this)) {
+fun List<InflectionPoint>.upTrend(): List<StockTrendWaveBo>? {
+    if (CollectionUtils.isEmpty(this) || this.size < 3) {
         return null
     }
     return null
-
-
 }
 
 

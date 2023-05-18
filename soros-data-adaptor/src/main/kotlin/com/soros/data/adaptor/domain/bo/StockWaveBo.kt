@@ -24,9 +24,7 @@ data class InflectionPoint(
 
 data class StockTrendWaveBo(
         var waveDirectionEnum: WaveDirectionEnum,
-        var startWaveBo: StockWaveBo,
-        var endWaveBo: StockWaveBo,
-        var lastDays: Int,
+        var lastDays: Int = 0,
         var range: BigDecimal,
         var trendMultiType: TrendMultiType,
         var code: String,
