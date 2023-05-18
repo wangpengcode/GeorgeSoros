@@ -93,3 +93,8 @@ wave:
     multiWaveInterval: 44
     inflectionPointDays: 10
     minInflectionPointDays: 6
+
+inflection:
+  config:
+    minInflectionPointDays: 6
+    inflectionPointJobCron: 0 24 11,22 * * ?

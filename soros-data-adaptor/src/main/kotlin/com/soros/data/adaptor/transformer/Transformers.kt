@@ -1,14 +1,13 @@
 package com.soros.data.adaptor.transformer
 
+import com.soros.data.adaptor.domain.bo.InflectionPoint
 import com.soros.data.adaptor.domain.bo.StockStatisticsDomainBo
 import com.soros.data.adaptor.domain.bo.StockWaveBo
 import com.soros.data.adaptor.dto.request.StockDailyDataDto
 import com.soros.data.adaptor.dto.request.StockIndex
 import com.soros.data.adaptor.dto.request.StockInfo
-import com.soros.data.adaptor.entity.StockHistoryEntity
-import com.soros.data.adaptor.entity.StockIndexEntity
-import com.soros.data.adaptor.entity.StockInfoEntity
-import com.soros.data.adaptor.entity.StockStatisticsEntity
+import com.soros.data.adaptor.entity.*
+import com.soros.data.adaptor.enums.TrendInflectionPointType
 import com.soros.data.adaptor.extension.fromJson
 import com.soros.data.adaptor.extension.toJson
 
@@ -38,18 +37,18 @@ fun StockDailyDataDto.toStockHistoryEntity(): StockHistoryEntity {
             zdRange = this.zdRange,
             zdAmount = this.zdAmount,
             change = this.change,
-            partitionCode = this.code?.replace("sh","")?.replace("sz","")?.toLong()
+            partitionCode = this.code?.replace("sh", "")?.replace("sz", "")?.toLong()
     )
 }
 
-fun StockIndex.toStockIndexEntity() : StockIndexEntity {
+fun StockIndex.toStockIndexEntity(): StockIndexEntity {
     return StockIndexEntity(
             code = this.code,
             name = this.name.orEmpty()
     )
 }
 
-fun StockStatisticsDomainBo.toStockStatisticsEntity() : StockStatisticsEntity {
+fun StockStatisticsDomainBo.toStockStatisticsEntity(): StockStatisticsEntity {
     return StockStatisticsEntity(
             code = this.code,
             type = this.type,
@@ -58,7 +57,7 @@ fun StockStatisticsDomainBo.toStockStatisticsEntity() : StockStatisticsEntity {
     )
 }
 
-fun StockStatisticsEntity.toStockStatisticsDomainBo() : StockStatisticsDomainBo {
+fun StockStatisticsEntity.toStockStatisticsDomainBo(): StockStatisticsDomainBo {
     return StockStatisticsDomainBo(
             code = this.code,
             type = this.type,
@@ -74,5 +73,27 @@ fun StockHistoryEntity.toStockWaveBo(): StockWaveBo {
             close = this.close!!,
             high = this.high!!,
             low = this.low!!
+    )
+}
+
+fun InflectionPoint.toStockInflectionPointEntity(): StockInflectionPointEntity {
+    return StockInflectionPointEntity(
+            code = this.code,
+            date = this.date,
+            high = this.high,
+            close = this.close,
+            low = this.low,
+            type = this.type.name
+    )
+}
+
+fun StockInflectionPointEntity.toInflectionPoint(): InflectionPoint {
+    return InflectionPoint(
+            code = this.code,
+            date = this.date,
+            high = this.high,
+            close = this.close,
+            low = this.low,
+            type = TrendInflectionPointType.valueOf(this.type)
     )
 }

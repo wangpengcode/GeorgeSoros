@@ -24,16 +24,17 @@ fun List<InflectionPoint>.trend(): List<StockTrendWaveBo>? {
 
 
 fun List<InflectionPoint>.findPeekAndValley(): List<InflectionPoint>? {
-    if (CollectionUtils.isEmpty(this)) {
+    if (CollectionUtils.isEmpty(this) && this.size < 20) {
         return null
     }
     val rawPeeks = this.filter { it.type == TrendInflectionPointType.MAX }.sortedBy { it.date }
     var i = 1
     val peeks = mutableListOf<InflectionPoint>()
-    peeks.add(rawPeeks[0])
+    if (rawPeeks.isNotEmpty())
+        peeks.add(rawPeeks[0])
 
-    while (i < rawPeeks.size - 2) {
-        if ((rawPeeks[i].high!! > rawPeeks[i-1].high) && rawPeeks[i].high!! > rawPeeks[i+1].high) {
+    while (i < rawPeeks.size - 2 && (rawPeeks.isNotEmpty() && rawPeeks.size > 4)) {
+        if ((rawPeeks[i].high!! > rawPeeks[i - 1].high) && rawPeeks[i].high!! > rawPeeks[i + 1].high) {
             peeks.add(rawPeeks[i])
         }
         i++
@@ -42,10 +43,11 @@ fun List<InflectionPoint>.findPeekAndValley(): List<InflectionPoint>? {
     val valleyList = this.filter { it.type == TrendInflectionPointType.MIN }.sortedBy { it.date }
     i = 1
     val valleys = mutableListOf<InflectionPoint>()
-    valleys.add(valleyList[0])
+    if (valleys.isNotEmpty())
+        valleys.add(valleyList[0])
 
-    while (i < valleyList.size - 2) {
-        if ((valleyList[i].low!! < valleyList[i-1].low) && valleyList[i].low!! < valleyList[i+1].low) {
+    while (i < valleyList.size - 2 && (valleyList.isNotEmpty() && valleyList.size > 4)) {
+        if ((valleyList[i].low!! < valleyList[i - 1].low) && valleyList[i].low!! < valleyList[i + 1].low) {
             peeks.add(valleyList[i])
         }
         i++
@@ -95,11 +97,11 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
         return null
     }
     val sortedList = this.sortedBy { it.date }
-    val result = mutableListOf<InflectionPoint>(InflectionPoint(code = sortedList[0].code, date = sortedList[0].date, close = sortedList[0].close, type = TrendInflectionPointType.MAX))
+    val result = mutableListOf(InflectionPoint(code = sortedList[0].code, date = sortedList[0].date, close = sortedList[0].close, high = sortedList[0].high, low = sortedList[0].low, type = TrendInflectionPointType.MAX))
     var start = 0
     var end = 0
     var endAmend = 0 // 终点修正
-    while (start < sortedList.size - 2 * inflectionPointDays) {
+    while (start < sortedList.size - 2 * inflectionPointDays && end < sortedList.size - 1) {
         end = start + inflectionPointDays + endAmend
         val currentSegment = sortedList.subList(start, end)
         val startDay = currentSegment[0]
@@ -116,6 +118,7 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
                     date = max.date,
                     close = max.close,
                     high = max.high,
+                    low = max.low,
                     type = TrendInflectionPointType.MAX
             )
         }
@@ -124,12 +127,13 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
                     code = min.code,
                     date = min.date,
                     close = min.close,
+                    high = min.high,
                     low = min.low,
                     type = TrendInflectionPointType.MIN
             )
         }
 
-        if (max.date == endDay.date) {
+        if (max.date == endDay.date && (end < sortedList.size - 4)) {
             val lastMax = sortedList.subList(end, end + 3).stream().max(Comparator.comparing(StockWaveBo::high)).get()
             if (lastMax.high < max.high) {
                 maxInflection = InflectionPoint(
@@ -137,12 +141,13 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
                         date = max.date,
                         close = max.close,
                         high = max.high,
+                        low = max.low,
                         type = TrendInflectionPointType.MAX
                 )
             }
         }
 
-        if (max.date == startDay.date) {
+        if (max.date == startDay.date && start > 3) {
             val lastMax = sortedList.subList(start - 3, start).stream().max(Comparator.comparing(StockWaveBo::high)).get()
             if (lastMax.high < max.high) {
                 maxInflection = InflectionPoint(
@@ -150,12 +155,13 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
                         date = max.date,
                         close = max.close,
                         high = max.high,
+                        low = max.low,
                         type = TrendInflectionPointType.MAX
                 )
             }
         }
 
-        if (min.date == endDay.date) {
+        if (min.date == endDay.date && (end < sortedList.size - 4)) {
             val lastLow = sortedList.subList(end, end + 3).stream().max(Comparator.comparing(StockWaveBo::low)).get()
             if (lastLow.low > min.low) {
                 minInflection = InflectionPoint(
@@ -163,19 +169,21 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
                         close = min.close,
                         date = min.date,
                         low = min.low,
+                        high = min.low,
                         type = TrendInflectionPointType.MIN
                 )
             }
         }
 
         if (min.date == startDay.date && start > 3) {
-            val beforeLow = sortedList.subList(start -3, start).stream().max(Comparator.comparing(StockWaveBo::low)).get()
+            val beforeLow = sortedList.subList(start - 3, start).stream().max(Comparator.comparing(StockWaveBo::low)).get()
             if (beforeLow.low > min.low) {
                 minInflection = InflectionPoint(
                         code = min.code,
                         close = min.close,
                         date = min.date,
                         low = min.low,
+                        high = min.high,
                         type = TrendInflectionPointType.MIN
                 )
             }

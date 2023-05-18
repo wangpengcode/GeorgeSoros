@@ -16,7 +16,7 @@ data class StockWaveBo(
 data class InflectionPoint(
         val code: String,
         var date: String,
-        var close: BigDecimal,
+        var close: BigDecimal? = null,
         var high: BigDecimal? =null,
         var low: BigDecimal? = null,
         var type: TrendInflectionPointType

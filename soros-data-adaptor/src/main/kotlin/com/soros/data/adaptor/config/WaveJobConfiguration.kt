@@ -16,7 +16,7 @@ class WaveJobConfiguration {
 
     var inflectionPointDays = 20
 
-    var minInflectionPointDays = 6
+
 
     @Bean
     fun waveJobCron(): String {
