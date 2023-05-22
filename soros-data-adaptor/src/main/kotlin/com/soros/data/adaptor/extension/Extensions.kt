@@ -3,9 +3,12 @@ package com.soros.data.adaptor.extension
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
 import com.soros.data.adaptor.domain.bo.InflectionPoint
+import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
 import com.soros.data.adaptor.enums.InflectionPointType
+import com.soros.data.adaptor.enums.WaveDirectionEnum
 import org.springframework.util.CollectionUtils
 import org.springframework.util.StringUtils
+import java.math.BigDecimal
 import kotlin.streams.toList
 
 var mapper: ObjectMapper = ObjectMapper()
@@ -22,7 +25,7 @@ inline fun <reified T> String.fromJson(): T {
 
 inline fun <reified T> String.fromListJson(elementType: Class<T>): List<T> {
     return try {
-        mapper.readValue(this,mapper.typeFactory.constructCollectionType(List::class.java, elementType))
+        mapper.readValue(this, mapper.typeFactory.constructCollectionType(List::class.java, elementType))
     } catch (e: Exception) {
         emptyList()
     }
@@ -49,4 +52,20 @@ fun isAllMax(first: InflectionPoint, second: InflectionPoint, third: InflectionP
 
 fun isAllMin(first: InflectionPoint, second: InflectionPoint, third: InflectionPoint): Boolean {
     return first.type == InflectionPointType.MIN && second.type == InflectionPointType.MIN && third.type == InflectionPointType.MIN
+}
+
+fun InflectionPoint.getValue(): BigDecimal {
+    return if (this.type == InflectionPointType.MIN) {
+        return if (this.high != null) this.high!! else BigDecimal.ZERO
+    } else {
+        return if (this.low != null) this.low!! else BigDecimal.ZERO
+    }
+}
+
+fun StockTrendWaveBo.isUpTrend(): Boolean {
+    return this.waveDirectionEnum == WaveDirectionEnum.RISE
+}
+
+fun StockTrendWaveBo.isDownTrend(): Boolean {
+    return this.waveDirectionEnum == WaveDirectionEnum.FALL
 }

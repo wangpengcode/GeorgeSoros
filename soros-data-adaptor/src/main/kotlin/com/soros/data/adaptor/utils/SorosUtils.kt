@@ -5,9 +5,96 @@ import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
 import com.soros.data.adaptor.domain.bo.StockWaveBo
 import com.soros.data.adaptor.domain.bo.StockWaveSingleBo
 import com.soros.data.adaptor.enums.InflectionPointType
+import com.soros.data.adaptor.enums.TrendMultiType
 import com.soros.data.adaptor.enums.WaveDirectionEnum
+import com.soros.data.adaptor.extension.*
 import org.springframework.util.CollectionUtils
+import java.math.BigDecimal
 import java.util.*
+
+/**
+ * 落差法判断趋势
+ * 从第二点开始,下一个值减去上一个值大于0;则为升差
+ * 若下一个值减去上一个值小于0;则为落差
+ * 上一个点若为波峰,下一个值也为波峰,则上一个升差+（下一个值-上一个值）
+ * 上一个点若为波谷,下一个值也为波谷,则上一个落差+（下一个值-上一个值）
+ */
+fun List<InflectionPoint>.trend(): List<StockTrendWaveBo>? {
+    if (CollectionUtils.isEmpty(this) || this.size < 3) {
+        return null
+    }
+    var result = mutableListOf<StockTrendWaveBo>()
+    var i = 1
+    var lastDownTrendValue = BigDecimal.ZERO
+    var lastUpTrendValue = BigDecimal.ZERO
+    var lastTrend: WaveDirectionEnum? = null
+
+    var preTrendWave = StockTrendWaveBo(
+            code = this[0].code,
+            startInflectionPoint = this[0],
+            waveDirectionEnum = if (this[1].isMax()) WaveDirectionEnum.RISE else WaveDirectionEnum.FALL,
+            range = BigDecimal.ZERO,
+            trendMultiType = TrendMultiType.M
+    )
+    var lastDownTrendAmount: BigDecimal = preTrendWave.startInflectionPoint!!.getValue()
+    var lastUpTrendAmount: BigDecimal = BigDecimal.ZERO
+
+    while (i < this.size - 3) {
+        var currentValue: BigDecimal
+        val pre = this[i-1]
+        val current = this[i]
+        if (current.isMax() && pre.isMax()) {
+            lastUpTrendValue = lastUpTrendValue.add(current.getValue().subtract(pre.getValue()))
+            lastUpTrendAmount = current.getValue()
+            // 趋势持续
+            preTrendWave.apply {
+                endInflectionPoint = current
+            }
+            i++
+            continue
+        } else if (current.isMin() && pre.isMin()) {
+            lastDownTrendValue = lastDownTrendValue.add(current.getValue().subtract(pre.getValue()))
+            lastDownTrendAmount = current.getValue()
+            // 趋势持续
+            preTrendWave.apply {
+                endInflectionPoint = current
+            }
+            i++
+            continue
+        } else {
+            currentValue = current.getValue().subtract(pre.getValue())
+            if (currentValue > BigDecimal.ZERO
+                    && preTrendWave.isUpTrend()
+                    && current.getValue() > lastUpTrendAmount) {
+                // 趋势延续
+                lastUpTrendAmount = current.getValue()
+                preTrendWave.apply {
+                    endInflectionPoint = current
+                }
+            } else if (currentValue < BigDecimal.ZERO
+                    && preTrendWave.isDownTrend()
+                    && current.getValue() < lastDownTrendAmount) {
+                // 趋势延续
+                lastDownTrendAmount = current.getValue()
+                preTrendWave.apply {
+                    endInflectionPoint = current
+                }
+            } else {
+                // 趋势反转
+                result.add(preTrendWave)
+                preTrendWave = StockTrendWaveBo(
+                        code = current.code,
+                        startInflectionPoint = preTrendWave.endInflectionPoint,
+                        waveDirectionEnum = if (current.isMax()) WaveDirectionEnum.RISE else WaveDirectionEnum.FALL,
+                        range = BigDecimal.ZERO,
+                        trendMultiType = TrendMultiType.M
+                )
+            }
+        }
+        i++
+    }
+    return result
+}
 
 /***
  * 下降趋势,随之而来的高点逐步降低,低点越来越低

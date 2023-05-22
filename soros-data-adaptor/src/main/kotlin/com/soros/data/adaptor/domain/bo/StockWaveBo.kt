@@ -28,8 +28,8 @@ data class StockTrendWaveBo(
         var range: BigDecimal,
         var trendMultiType: TrendMultiType,
         var code: String,
-        var startInflectionPoint: InflectionPoint,
-        var endInflectionPoint: InflectionPoint
+        var startInflectionPoint: InflectionPoint? = null,
+        var endInflectionPoint: InflectionPoint? = null
 )
 
 data class StockWaveSingleBo(

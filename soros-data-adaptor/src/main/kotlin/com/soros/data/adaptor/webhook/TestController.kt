@@ -5,10 +5,7 @@ import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
 import com.soros.data.adaptor.service.StockHistoryPersistenceService
 import com.soros.data.adaptor.service.StockInfoPersistenceService
 import com.soros.data.adaptor.transformer.toStockWaveBo
-import com.soros.data.adaptor.utils.findInflectionPoint
-import com.soros.data.adaptor.utils.findPeekAndValley
-import com.soros.data.adaptor.utils.merge
-import com.soros.data.adaptor.utils.upTrend
+import com.soros.data.adaptor.utils.*
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -24,5 +21,12 @@ class TestController(val history: StockHistoryPersistenceService, val info: Stoc
     fun testWave(@PathVariable stockNo: String): List<InflectionPoint>? {
         val histories = history.findByStockNo(stockNo)
         return histories?.map { it.toStockWaveBo() }?.findInflectionPoint(6)?.merge()?.findPeekAndValley()
+    }
+
+    @RequestMapping("/trend/{stockNo}", method = [RequestMethod.GET])
+    @ResponseBody
+    fun trend(@PathVariable stockNo: String): List<StockTrendWaveBo>? {
+        val histories = history.findByStockNo(stockNo)
+        return histories?.map { it.toStockWaveBo() }?.findInflectionPoint(6)?.merge()?.findPeekAndValley()?.trend()
     }
 }
