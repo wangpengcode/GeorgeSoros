@@ -4,7 +4,7 @@ import com.soros.data.adaptor.domain.bo.InflectionPoint
 import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
 import com.soros.data.adaptor.domain.bo.StockWaveBo
 import com.soros.data.adaptor.domain.bo.StockWaveSingleBo
-import com.soros.data.adaptor.enums.TrendInflectionPointType
+import com.soros.data.adaptor.enums.InflectionPointType
 import com.soros.data.adaptor.enums.WaveDirectionEnum
 import org.springframework.util.CollectionUtils
 import java.util.*
@@ -17,6 +17,16 @@ fun List<InflectionPoint>.upTrend(): List<StockTrendWaveBo>? {
     if (CollectionUtils.isEmpty(this) || this.size < 3) {
         return null
     }
+    var i = 0
+    var trendType: WaveDirectionEnum? = null
+    var result = mutableListOf<StockTrendWaveBo>()
+    while (i < this.size - 3) {
+        // 只取低点越来越高,高点越来越高
+        // 只取低点越来越低,高点越来越低
+        // 期间若有震荡,震荡不超过3个月,且3月后按照原方向走,则趋势保留;震荡的定义:高点/低点的在之前高点/低点的均值附近低于19%.
+    }
+
+
     return null
 }
 
@@ -25,7 +35,7 @@ fun List<InflectionPoint>.findPeekAndValley(): List<InflectionPoint>? {
     if (CollectionUtils.isEmpty(this) && this.size < 20) {
         return null
     }
-    val rawPeeks = this.filter { it.type == TrendInflectionPointType.MAX }.sortedBy { it.date }
+    val rawPeeks = this.filter { it.type == InflectionPointType.MAX }.sortedBy { it.date }
     var i = 1
     val peeks = mutableListOf<InflectionPoint>()
     if (rawPeeks.isNotEmpty())
@@ -38,7 +48,7 @@ fun List<InflectionPoint>.findPeekAndValley(): List<InflectionPoint>? {
         i++
     }
 
-    val valleyList = this.filter { it.type == TrendInflectionPointType.MIN }.sortedBy { it.date }
+    val valleyList = this.filter { it.type == InflectionPointType.MIN }.sortedBy { it.date }
     i = 1
     val valleys = mutableListOf<InflectionPoint>()
     if (valleys.isNotEmpty())
@@ -71,10 +81,10 @@ fun List<InflectionPoint>.merge(): List<InflectionPoint>? {
         val currentPoint = newList[current]
         val lastPoint = newList[last]
         if (currentPoint.type == lastPoint.type) {
-            if (currentPoint.type == TrendInflectionPointType.MIN && (currentPoint.low!! < lastPoint.low)) {
+            if (currentPoint.type == InflectionPointType.MIN && (currentPoint.low!! < lastPoint.low)) {
                 result.add(currentPoint)
             }
-            if (currentPoint.type == TrendInflectionPointType.MAX && (currentPoint.high != null) && (currentPoint.high!! > lastPoint.high)) {
+            if (currentPoint.type == InflectionPointType.MAX && (currentPoint.high != null) && (currentPoint.high!! > lastPoint.high)) {
                 result.add(currentPoint)
             }
             current++
@@ -95,7 +105,7 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
         return null
     }
     val sortedList = this.sortedBy { it.date }
-    val result = mutableListOf(InflectionPoint(code = sortedList[0].code, date = sortedList[0].date, close = sortedList[0].close, high = sortedList[0].high, low = sortedList[0].low, type = TrendInflectionPointType.MAX))
+    val result = mutableListOf(InflectionPoint(code = sortedList[0].code, date = sortedList[0].date, close = sortedList[0].close, high = sortedList[0].high, low = sortedList[0].low, type = InflectionPointType.MAX))
     var start = 0
     var end = 0
     var endAmend = 0 // 终点修正
@@ -117,7 +127,7 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
                     close = max.close,
                     high = max.high,
                     low = max.low,
-                    type = TrendInflectionPointType.MAX
+                    type = InflectionPointType.MAX
             )
         }
         if (min.date != startDay.date && min.date != endDay.date) {
@@ -127,7 +137,7 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
                     close = min.close,
                     high = min.high,
                     low = min.low,
-                    type = TrendInflectionPointType.MIN
+                    type = InflectionPointType.MIN
             )
         }
 
@@ -140,7 +150,7 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
                         close = max.close,
                         high = max.high,
                         low = max.low,
-                        type = TrendInflectionPointType.MAX
+                        type = InflectionPointType.MAX
                 )
             }
         }
@@ -154,7 +164,7 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
                         close = max.close,
                         high = max.high,
                         low = max.low,
-                        type = TrendInflectionPointType.MAX
+                        type = InflectionPointType.MAX
                 )
             }
         }
@@ -168,7 +178,7 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
                         date = min.date,
                         low = min.low,
                         high = min.low,
-                        type = TrendInflectionPointType.MIN
+                        type = InflectionPointType.MIN
                 )
             }
         }
@@ -182,7 +192,7 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
                         date = min.date,
                         low = min.low,
                         high = min.high,
-                        type = TrendInflectionPointType.MIN
+                        type = InflectionPointType.MIN
                 )
             }
         }
@@ -219,9 +229,9 @@ fun List<StockWaveBo>.getStockWaveSingleBo(inflectionPointDays: Int): List<Stock
         if (Objects.nonNull(preWaveBo) && (bo!!.hasNoInflection() && preWaveBo!!.hasNoInflection() && bo.waveDirectionEnum != preWaveBo.waveDirectionEnum)) {
             preWaveBo.inflectionPoint = preWaveBo.maxPoint
             if (preWaveBo.waveDirectionEnum == WaveDirectionEnum.FALL) {
-                preWaveBo.inflectionPointType = TrendInflectionPointType.MIN
+                preWaveBo.inflectionPointType = InflectionPointType.MIN
             } else {
-                preWaveBo.inflectionPointType = TrendInflectionPointType.MAX
+                preWaveBo.inflectionPointType = InflectionPointType.MAX
             }
             result.add(preWaveBo)
             preWaveBo = bo

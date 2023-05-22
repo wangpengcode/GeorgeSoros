@@ -1,5 +1,6 @@
 package com.soros.data.adaptor.webhook
 
+import com.soros.data.adaptor.domain.bo.InflectionPoint
 import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
 import com.soros.data.adaptor.service.StockHistoryPersistenceService
 import com.soros.data.adaptor.service.StockInfoPersistenceService
@@ -20,8 +21,8 @@ class TestController(val history: StockHistoryPersistenceService, val info: Stoc
 
     @RequestMapping("/inflection/{stockNo}", method = [RequestMethod.GET])
     @ResponseBody
-    fun testWave(@PathVariable stockNo: String): List<StockTrendWaveBo>? {
+    fun testWave(@PathVariable stockNo: String): List<InflectionPoint>? {
         val histories = history.findByStockNo(stockNo)
-        return histories?.map { it.toStockWaveBo() }?.findInflectionPoint(6)?.merge()?.findPeekAndValley()?.upTrend()
+        return histories?.map { it.toStockWaveBo() }?.findInflectionPoint(6)?.merge()?.findPeekAndValley()
     }
 }

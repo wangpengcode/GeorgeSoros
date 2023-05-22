@@ -7,7 +7,7 @@ import com.soros.data.adaptor.dto.request.StockDailyDataDto
 import com.soros.data.adaptor.dto.request.StockIndex
 import com.soros.data.adaptor.dto.request.StockInfo
 import com.soros.data.adaptor.entity.*
-import com.soros.data.adaptor.enums.TrendInflectionPointType
+import com.soros.data.adaptor.enums.InflectionPointType
 import com.soros.data.adaptor.extension.fromJson
 import com.soros.data.adaptor.extension.toJson
 
@@ -94,6 +94,6 @@ fun StockInflectionPointEntity.toInflectionPoint(): InflectionPoint {
             high = this.high,
             close = this.close,
             low = this.low,
-            type = TrendInflectionPointType.valueOf(this.type)
+            type = InflectionPointType.valueOf(this.type)
     )
 }

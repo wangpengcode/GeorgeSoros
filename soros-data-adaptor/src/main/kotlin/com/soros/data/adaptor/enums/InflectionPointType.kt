@@ -1,6 +1,6 @@
 package com.soros.data.adaptor.enums
 
-enum class TrendInflectionPointType {
+enum class InflectionPointType {
     MAX,
     MIN
 }
