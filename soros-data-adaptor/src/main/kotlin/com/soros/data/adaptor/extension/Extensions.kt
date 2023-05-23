@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.soros.data.adaptor.common.Commons.Companion.INFLECTION_POINT_DAYS
 import com.soros.data.adaptor.domain.bo.InflectionPoint
 import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
+import com.soros.data.adaptor.entity.MarketEntity
 import com.soros.data.adaptor.entity.StockHistoryEntity
 import com.soros.data.adaptor.enums.InflectionPointType
 import com.soros.data.adaptor.enums.WaveDirectionEnum
@@ -88,4 +89,16 @@ fun List<StockHistoryEntity>.findLittleTrend(): List<StockTrendWaveBo>? {
 
 fun List<StockHistoryEntity>.findPeekAndValley(): List<InflectionPoint>? {
     return this.map { it.toStockWaveBo() }.findInflectionPoint(INFLECTION_POINT_DAYS)?.merge()?.findPeekAndValley()
+}
+
+fun List<StockHistoryEntity>.toMarketEntity(): MarketEntity? {
+    if (this.isEmpty()) return null
+    val market = MarketEntity(
+            date = this[0].date
+    )
+    val histories = this
+    market.apply {
+        market_stocks = histories.size.toBigInteger()
+    }
+    return market
 }

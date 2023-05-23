@@ -98,3 +98,7 @@ inflection:
   config:
     minInflectionPointDays: 6
     inflectionPointJobCron: 0 24 11,22 * * ?
+
+market:
+  config:
+    marketJobCron: 0 12 11,21 * * ?
