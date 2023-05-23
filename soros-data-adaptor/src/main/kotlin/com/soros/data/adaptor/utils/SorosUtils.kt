@@ -23,7 +23,7 @@ fun List<InflectionPoint>.trend(): List<StockTrendWaveBo>? {
     if (CollectionUtils.isEmpty(this) || this.size < 3) {
         return null
     }
-    var result = mutableListOf<StockTrendWaveBo>()
+    val result = mutableListOf<StockTrendWaveBo>()
     var i = 1
     var lastDownTrendValue = BigDecimal.ZERO
     var lastUpTrendValue = BigDecimal.ZERO
