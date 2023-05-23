@@ -22,7 +22,10 @@ fun List<StockTrendWaveBo>.bigTrend(): List<StockTrendWaveBo> {
     if (this.size < 3) {
         return this
     }
+    var i = 0
+    while (i < this.size - 3) {
 
+    }
     return this
 }
 
