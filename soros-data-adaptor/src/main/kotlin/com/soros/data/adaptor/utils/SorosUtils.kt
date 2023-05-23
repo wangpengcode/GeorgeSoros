@@ -48,7 +48,7 @@ fun List<StockTrendWaveBo>.bigTrend(): List<StockTrendWaveBo> {
         } else {
             if (first.isUpTrend()) {
                 pre.apply {
-                    range = endInflectionPoint!!.getValue().subtract(startInflectionPoint!!.getValue()).divide(startInflectionPoint!!.getValue(), SCALE_OF_SOROS, RoundingMode.HALF_EVEN)
+                    range = endInflectionPoint!!.getValue().subtract(startInflectionPoint!!.getValue()).divide(startInflectionPoint!!.getValue(), SCALE_OF_SOROS, RoundingMode.HALF_EVEN).abs()
                 }
                 result.add(pre)
                 pre = this[i + 1]
