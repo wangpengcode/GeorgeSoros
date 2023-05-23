@@ -85,6 +85,7 @@ fun List<InflectionPoint>.trend(): List<StockTrendWaveBo>? {
                 preTrendWave = StockTrendWaveBo(
                         code = current.code,
                         startInflectionPoint = preTrendWave.endInflectionPoint,
+                        endInflectionPoint = current,
                         waveDirectionEnum = if (current.isMax()) WaveDirectionEnum.RISE else WaveDirectionEnum.FALL,
                         range = BigDecimal.ZERO,
                         trendMultiType = TrendMultiType.M
