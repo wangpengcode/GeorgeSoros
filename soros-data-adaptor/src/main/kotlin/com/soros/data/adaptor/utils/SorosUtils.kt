@@ -15,7 +15,7 @@ import java.math.RoundingMode
 import java.util.*
 
 /***
- * 趋势合并
+ * 五：趋势合并
  *
  */
 fun List<StockTrendWaveBo>.bigTrend(): List<StockTrendWaveBo> {
@@ -24,7 +24,7 @@ fun List<StockTrendWaveBo>.bigTrend(): List<StockTrendWaveBo> {
 
 
 /**
- * 落差法判断趋势
+ * 四：落差法判断趋势
  * 从第二点开始,下一个值减去上一个值大于0;则为升差
  * 若下一个值减去上一个值小于0;则为落差
  * 上一个点若为波峰,下一个值也为波峰,则上一个升差+（下一个值-上一个值）
@@ -108,28 +108,9 @@ fun List<InflectionPoint>.littleTrend(): List<StockTrendWaveBo>? {
     return result
 }
 
-/***
- * 下降趋势,随之而来的高点逐步降低,低点越来越低
- * 上升趋势,随之而来低高点逐步提升,低点越来越高
+/**
+ * 三：波峰波谷
  */
-fun List<InflectionPoint>.upTrend(): List<StockTrendWaveBo>? {
-    if (CollectionUtils.isEmpty(this) || this.size < 3) {
-        return null
-    }
-    var i = 0
-    var trendType: WaveDirectionEnum? = null
-    var result = mutableListOf<StockTrendWaveBo>()
-    while (i < this.size - 3) {
-        // 只取低点越来越高,高点越来越高
-        // 只取低点越来越低,高点越来越低
-        // 期间若有震荡,震荡不超过3个月,且3月后按照原方向走,则趋势保留;震荡的定义:高点/低点的在之前高点/低点的均值附近低于19%.
-    }
-
-
-    return null
-}
-
-
 fun List<InflectionPoint>.findPeekAndValley(): List<InflectionPoint>? {
     if (CollectionUtils.isEmpty(this) && this.size < 20) {
         return null
@@ -165,7 +146,7 @@ fun List<InflectionPoint>.findPeekAndValley(): List<InflectionPoint>? {
 }
 
 /**
- * 合并; 测试正确
+ * 二： 合并; 测试正确
  * **/
 fun List<InflectionPoint>.merge(): List<InflectionPoint>? {
     if (CollectionUtils.isEmpty(this)) {
@@ -197,7 +178,7 @@ fun List<InflectionPoint>.merge(): List<InflectionPoint>? {
 }
 
 /**
- * 拐点,在某一小区间内的极值点定义为拐点,测试正确
+ * 一： 拐点,在某一小区间内的极值点定义为拐点,测试正确
  */
 fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<InflectionPoint>? {
     if (CollectionUtils.isEmpty(this) || this.size < 2 * inflectionPointDays + 1) {
@@ -307,73 +288,4 @@ fun List<StockWaveBo>.findInflectionPoint(inflectionPointDays: Int): List<Inflec
         start = end
     }
     return result
-}
-
-
-fun List<StockWaveBo>.getStockWaveSingleBo(inflectionPointDays: Int): List<StockWaveSingleBo>? {
-    if (this.isEmpty() || this.size < inflectionPointDays) {
-        return null
-    }
-    val result: MutableList<StockWaveSingleBo> = mutableListOf()
-    val newList = this.sortedBy { it.date }
-    var times = 0
-    var preWaveBo: StockWaveSingleBo? = null
-    while (!CollectionUtils.isEmpty(getSubList(newList, times, inflectionPointDays))) {
-        val currentSegment: List<StockWaveBo> = getSubList(newList, times, inflectionPointDays)!!
-        var bo: StockWaveSingleBo? = handleStockWaveSingleBo(currentSegment)
-        if (Objects.isNull(bo)) {
-            break
-        }
-        // 两个相反方向趋势,无拐点,则两个趋势的交汇点即为拐点
-        if (Objects.nonNull(preWaveBo) && (bo!!.hasNoInflection() && preWaveBo!!.hasNoInflection() && bo.waveDirectionEnum != preWaveBo.waveDirectionEnum)) {
-            preWaveBo.inflectionPoint = preWaveBo.maxPoint
-            if (preWaveBo.waveDirectionEnum == WaveDirectionEnum.FALL) {
-                preWaveBo.inflectionPointType = InflectionPointType.MIN
-            } else {
-                preWaveBo.inflectionPointType = InflectionPointType.MAX
-            }
-            result.add(preWaveBo)
-            preWaveBo = bo
-            times++
-            continue
-        }
-        // 两个相同方向趋势,无拐点进行叠加
-        if (Objects.nonNull(preWaveBo) && (bo!!.hasNoInflection() && preWaveBo!!.hasNoInflection() && bo.waveDirectionEnum == preWaveBo.waveDirectionEnum)) {
-            bo = mergeSameWaveSingleBo(preWaveBo, bo)
-        }
-
-        times++
-        preWaveBo = bo
-    }
-    return result
-}
-
-fun StockWaveSingleBo.hasNoInflection(): Boolean {
-    return this.inflectionPointType == null
-}
-
-fun mergeSameWaveSingleBo(start: StockWaveSingleBo, end: StockWaveSingleBo): StockWaveSingleBo {
-    return StockWaveSingleBo(
-            waveDirectionEnum = start.waveDirectionEnum,
-            maxPoint = end.maxPoint,
-            minPoint = start.minPoint
-    )
-}
-
-fun handleStockWaveSingleBo(list: List<StockWaveBo>): StockWaveSingleBo? {
-
-
-    return null
-}
-
-fun getSubList(list: List<StockWaveBo>, times: Int, batchSize: Int): List<StockWaveBo>? {
-    if (CollectionUtils.isEmpty(list)) {
-        return null
-    }
-    val start = times * batchSize
-    val end = start + batchSize
-    if (end > list.size) {
-        return list.subList(start, list.size)
-    }
-    return list.subList(start, end)
 }
