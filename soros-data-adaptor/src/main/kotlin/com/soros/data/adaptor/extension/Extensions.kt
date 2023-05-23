@@ -2,10 +2,14 @@ package com.soros.data.adaptor.extension
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
+import com.soros.data.adaptor.common.Commons.Companion.INFLECTION_POINT_DAYS
 import com.soros.data.adaptor.domain.bo.InflectionPoint
 import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
+import com.soros.data.adaptor.entity.StockHistoryEntity
 import com.soros.data.adaptor.enums.InflectionPointType
 import com.soros.data.adaptor.enums.WaveDirectionEnum
+import com.soros.data.adaptor.transformer.toStockWaveBo
+import com.soros.data.adaptor.utils.*
 import org.springframework.util.CollectionUtils
 import org.springframework.util.StringUtils
 import java.math.BigDecimal
@@ -72,4 +76,16 @@ fun StockTrendWaveBo.isDownTrend(): Boolean {
 
 fun StockTrendWaveBo.trendValue(): BigDecimal {
     return if (this.waveDirectionEnum == WaveDirectionEnum.RISE) this.range else this.range.negate()
+}
+
+fun List<StockHistoryEntity>.findBigTrend(): List<StockTrendWaveBo>? {
+    return this.map { it.toStockWaveBo() }.findInflectionPoint(INFLECTION_POINT_DAYS)?.merge()?.findPeekAndValley()?.littleTrend()?.bigTrend()
+}
+
+fun List<StockHistoryEntity>.findLittleTrend(): List<StockTrendWaveBo>? {
+    return this.map { it.toStockWaveBo() }.findInflectionPoint(INFLECTION_POINT_DAYS)?.merge()?.findPeekAndValley()?.littleTrend()
+}
+
+fun List<StockHistoryEntity>.findPeekAndValley(): List<InflectionPoint>? {
+    return this.map { it.toStockWaveBo() }.findInflectionPoint(INFLECTION_POINT_DAYS)?.merge()?.findPeekAndValley()
 }
