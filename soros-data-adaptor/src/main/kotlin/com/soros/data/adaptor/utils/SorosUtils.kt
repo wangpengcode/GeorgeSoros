@@ -22,60 +22,8 @@ fun List<StockTrendWaveBo>.bigTrend(): List<StockTrendWaveBo> {
     if (this.size < 3) {
         return this
     }
-    var i = 1
 
-    var lastUpTrendAmount = this[0].endInflectionPoint!!.getValue()
-    var lastDownTrendAmount = this[0].endInflectionPoint!!.getValue()
-    var result = mutableListOf<StockTrendWaveBo>()
-    while (i < this.size - 2) {
-        var current = this[i]
-        val pre = this[i-1]
-        if (pre.isUpTrend() && current.isUpTrend()) {
-            lastUpTrendAmount = current.endInflectionPoint!!.getValue()
-            // 趋势延续
-            pre.apply {
-                endInflectionPoint = current.endInflectionPoint
-            }
-            i++
-            continue
-        } else if (pre.isDownTrend() && current.isDownTrend()) {
-            lastDownTrendAmount = current.endInflectionPoint!!.getValue()
-            pre.apply {
-                endInflectionPoint = current.endInflectionPoint
-            }
-            i++
-            continue
-            // 趋势延续
-        } else {
-            if (pre.isUpTrend()
-                    && current.isDownTrend()
-                    && current.endInflectionPoint!!.getValue() > lastUpTrendAmount.multiply(BigDecimal.ZERO.subtract(BIG_TREND_TOLERATE_RANGE))) {
-                // 趋势延续
-                lastDownTrendAmount = current.endInflectionPoint!!.getValue()
-                // 趋势延续
-                pre.apply {
-                    endInflectionPoint = current.endInflectionPoint
-                }
-            } else if (pre.isDownTrend()
-                    && current.isUpTrend()
-                    && current.endInflectionPoint!!.getValue() < lastDownTrendAmount.multiply(BigDecimal.ZERO.subtract(BIG_TREND_TOLERATE_RANGE))) {
-                // 趋势延续
-                lastUpTrendAmount = current.endInflectionPoint!!.getValue()
-                pre.apply {
-                    endInflectionPoint = current.endInflectionPoint
-                }
-            } else {
-                println("反转")
-                //趋势反转
-                pre.apply {
-                    range = endInflectionPoint!!.getValue().subtract(startInflectionPoint!!.getValue()).divide(startInflectionPoint!!.getValue(), SCALE_OF_SOROS, RoundingMode.HALF_EVEN)
-                }
-                result.add(pre)
-            }
-        }
-        i++
-    }
-    return result
+    return this
 }
 
 
@@ -146,6 +94,9 @@ fun List<InflectionPoint>.littleTrend(): List<StockTrendWaveBo>? {
                 }
             } else {
                 // 趋势反转
+                preTrendWave.apply {
+                    range = endInflectionPoint!!.getValue().subtract(startInflectionPoint!!.getValue()).divide(startInflectionPoint!!.getValue(), SCALE_OF_SOROS, RoundingMode.HALF_EVEN)
+                }
                 result.add(preTrendWave)
                 preTrendWave = StockTrendWaveBo(
                         code = current.code,
