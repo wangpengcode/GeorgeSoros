@@ -69,3 +69,7 @@ fun StockTrendWaveBo.isUpTrend(): Boolean {
 fun StockTrendWaveBo.isDownTrend(): Boolean {
     return this.waveDirectionEnum == WaveDirectionEnum.FALL
 }
+
+fun StockTrendWaveBo.trendValue(): BigDecimal {
+    return if (this.waveDirectionEnum == WaveDirectionEnum.RISE) this.range else this.range.negate()
+}

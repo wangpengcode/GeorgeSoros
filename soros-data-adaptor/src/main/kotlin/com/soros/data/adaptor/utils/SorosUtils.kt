@@ -1,10 +1,10 @@
 package com.soros.data.adaptor.utils
 
+import com.soros.data.adaptor.common.Commons.Companion.BIG_TREND_TOLERATE_RANGE
 import com.soros.data.adaptor.common.Commons.Companion.SCALE_OF_SOROS
 import com.soros.data.adaptor.domain.bo.InflectionPoint
 import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
 import com.soros.data.adaptor.domain.bo.StockWaveBo
-import com.soros.data.adaptor.domain.bo.StockWaveSingleBo
 import com.soros.data.adaptor.enums.InflectionPointType
 import com.soros.data.adaptor.enums.TrendMultiType
 import com.soros.data.adaptor.enums.WaveDirectionEnum
@@ -16,10 +16,66 @@ import java.util.*
 
 /***
  * 五：趋势合并
- *
+ * 不正确
  */
 fun List<StockTrendWaveBo>.bigTrend(): List<StockTrendWaveBo> {
-    return this
+    if (this.size < 3) {
+        return this
+    }
+    var i = 1
+
+    var lastUpTrendAmount = this[0].endInflectionPoint!!.getValue()
+    var lastDownTrendAmount = this[0].endInflectionPoint!!.getValue()
+    var result = mutableListOf<StockTrendWaveBo>()
+    while (i < this.size - 2) {
+        var current = this[i]
+        val pre = this[i-1]
+        if (pre.isUpTrend() && current.isUpTrend()) {
+            lastUpTrendAmount = current.endInflectionPoint!!.getValue()
+            // 趋势延续
+            pre.apply {
+                endInflectionPoint = current.endInflectionPoint
+            }
+            i++
+            continue
+        } else if (pre.isDownTrend() && current.isDownTrend()) {
+            lastDownTrendAmount = current.endInflectionPoint!!.getValue()
+            pre.apply {
+                endInflectionPoint = current.endInflectionPoint
+            }
+            i++
+            continue
+            // 趋势延续
+        } else {
+            if (pre.isUpTrend()
+                    && current.isDownTrend()
+                    && current.endInflectionPoint!!.getValue() > lastUpTrendAmount.multiply(BigDecimal.ZERO.subtract(BIG_TREND_TOLERATE_RANGE))) {
+                // 趋势延续
+                lastDownTrendAmount = current.endInflectionPoint!!.getValue()
+                // 趋势延续
+                pre.apply {
+                    endInflectionPoint = current.endInflectionPoint
+                }
+            } else if (pre.isDownTrend()
+                    && current.isUpTrend()
+                    && current.endInflectionPoint!!.getValue() < lastDownTrendAmount.multiply(BigDecimal.ZERO.subtract(BIG_TREND_TOLERATE_RANGE))) {
+                // 趋势延续
+                lastUpTrendAmount = current.endInflectionPoint!!.getValue()
+                pre.apply {
+                    endInflectionPoint = current.endInflectionPoint
+                }
+            } else {
+                println("反转")
+                //趋势反转
+                pre.apply {
+                    range = endInflectionPoint!!.getValue().subtract(startInflectionPoint!!.getValue()).divide(startInflectionPoint!!.getValue(), SCALE_OF_SOROS, RoundingMode.HALF_EVEN)
+                }
+                result.add(pre)
+            }
+        }
+        i++
+    }
+    return result
 }
 
 

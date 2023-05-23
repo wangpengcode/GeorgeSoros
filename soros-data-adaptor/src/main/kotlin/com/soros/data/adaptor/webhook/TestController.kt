@@ -29,4 +29,11 @@ class TestController(val history: StockHistoryPersistenceService, val info: Stoc
         val histories = history.findByStockNo(stockNo)
         return histories?.map { it.toStockWaveBo() }?.findInflectionPoint(6)?.merge()?.findPeekAndValley()?.littleTrend()
     }
+
+    @RequestMapping("/big/{stockNo}", method = [RequestMethod.GET])
+    @ResponseBody
+    fun big(@PathVariable stockNo: String): List<StockTrendWaveBo>? {
+        val histories = history.findByStockNo(stockNo)
+        return histories?.map { it.toStockWaveBo() }?.findInflectionPoint(6)?.merge()?.findPeekAndValley()?.littleTrend()?.bigTrend()
+    }
 }
