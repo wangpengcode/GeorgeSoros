@@ -1,6 +1,5 @@
 package com.soros.data.adaptor.utils
 
-import com.soros.data.adaptor.common.Commons.Companion.BIG_TREND_TOLERATE_RANGE
 import com.soros.data.adaptor.common.Commons.Companion.SCALE_OF_SOROS
 import com.soros.data.adaptor.domain.bo.InflectionPoint
 import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
@@ -23,10 +22,55 @@ fun List<StockTrendWaveBo>.bigTrend(): List<StockTrendWaveBo> {
         return this
     }
     var i = 0
+    var pre = this[0]
+    var result = mutableListOf<StockTrendWaveBo>()
     while (i < this.size - 3) {
-
+        val first = this[i]
+        val third = this[i + 2]
+        if (first.isUpTrend() && third.endInflectionPoint!!.getValue() > first.endInflectionPoint!!.getValue()) {
+            // 上涨趋势继续
+            pre.apply {
+                waveDirectionEnum = WaveDirectionEnum.RISE
+                endInflectionPoint = third.endInflectionPoint
+                range = endInflectionPoint!!.getValue().subtract(startInflectionPoint!!.getValue()).divide(startInflectionPoint!!.getValue(), SCALE_OF_SOROS, RoundingMode.HALF_EVEN)
+            }
+            i += 2
+            continue
+        } else if (first.isDownTrend() && third.endInflectionPoint!!.getValue() < first.endInflectionPoint!!.getValue()) {
+            // 下跌趋势继续
+            pre.apply {
+                waveDirectionEnum = WaveDirectionEnum.FALL
+                endInflectionPoint = third.endInflectionPoint
+                range = endInflectionPoint!!.getValue().subtract(startInflectionPoint!!.getValue()).divide(startInflectionPoint!!.getValue(), SCALE_OF_SOROS, RoundingMode.HALF_EVEN)
+            }
+            i += 2
+            continue
+        } else {
+            if (first.isUpTrend()) {
+                pre.apply {
+                    range = endInflectionPoint!!.getValue().subtract(startInflectionPoint!!.getValue()).divide(startInflectionPoint!!.getValue(), SCALE_OF_SOROS, RoundingMode.HALF_EVEN)
+                }
+                result.add(pre)
+                pre = this[i + 1]
+                pre.apply {
+                    waveDirectionEnum = WaveDirectionEnum.FALL
+                }
+                i++
+            } else {
+                pre.apply {
+                    range = endInflectionPoint!!.getValue().subtract(startInflectionPoint!!.getValue()).divide(startInflectionPoint!!.getValue(), SCALE_OF_SOROS, RoundingMode.HALF_EVEN)
+                }
+                result.add(pre)
+                pre = this[i + 1]
+                pre.apply {
+                    waveDirectionEnum = WaveDirectionEnum.RISE
+                }
+                i++
+            }
+            continue
+        }
     }
-    return this
+    return result
 }
 
 

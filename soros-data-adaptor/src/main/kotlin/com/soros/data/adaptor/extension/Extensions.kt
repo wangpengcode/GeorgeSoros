@@ -55,7 +55,7 @@ fun isAllMin(first: InflectionPoint, second: InflectionPoint, third: InflectionP
 }
 
 fun InflectionPoint.getValue(): BigDecimal {
-    return if (this.type == InflectionPointType.MIN) {
+    return if (this.type == InflectionPointType.MAX) {
         return if (this.high != null) this.high!! else BigDecimal.ZERO
     } else {
         return if (this.low != null) this.low!! else BigDecimal.ZERO
