@@ -15,7 +15,7 @@ import java.util.*
 
 /***
  * 五：趋势合并
- * 不正确
+ * 大趋势正确
  */
 fun List<StockTrendWaveBo>.bigTrend(): List<StockTrendWaveBo> {
     if (this.size < 3) {
