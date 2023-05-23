@@ -1,5 +1,6 @@
 package com.soros.data.adaptor.utils
 
+import com.soros.data.adaptor.common.Commons.Companion.SCALE_OF_SOROS
 import com.soros.data.adaptor.domain.bo.InflectionPoint
 import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
 import com.soros.data.adaptor.domain.bo.StockWaveBo
@@ -10,7 +11,17 @@ import com.soros.data.adaptor.enums.WaveDirectionEnum
 import com.soros.data.adaptor.extension.*
 import org.springframework.util.CollectionUtils
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.*
+
+/***
+ * 趋势合并
+ *
+ */
+fun List<StockTrendWaveBo>.bigTrend(): List<StockTrendWaveBo> {
+    return this
+}
+
 
 /**
  * 落差法判断趋势
@@ -39,7 +50,7 @@ fun List<InflectionPoint>.littleTrend(): List<StockTrendWaveBo>? {
 
     while (i < this.size - 3) {
         var currentValue: BigDecimal
-        val pre = this[i-1]
+        val pre = this[i - 1]
         val current = this[i]
         if (current.isMax() && pre.isMax()) {
             lastUpTrendValue = lastUpTrendValue.add(current.getValue().subtract(pre.getValue()))
@@ -87,7 +98,9 @@ fun List<InflectionPoint>.littleTrend(): List<StockTrendWaveBo>? {
                         waveDirectionEnum = if (current.isMax()) WaveDirectionEnum.RISE else WaveDirectionEnum.FALL,
                         range = BigDecimal.ZERO,
                         trendMultiType = TrendMultiType.M
-                )
+                ).apply {
+                    range = endInflectionPoint!!.getValue().subtract(startInflectionPoint!!.getValue()).divide(startInflectionPoint!!.getValue(), SCALE_OF_SOROS, RoundingMode.HALF_EVEN)
+                }
             }
         }
         i++
