@@ -27,6 +27,6 @@ class TestController(val history: StockHistoryPersistenceService, val info: Stoc
     @ResponseBody
     fun trend(@PathVariable stockNo: String): List<StockTrendWaveBo>? {
         val histories = history.findByStockNo(stockNo)
-        return histories?.map { it.toStockWaveBo() }?.findInflectionPoint(6)?.merge()?.findPeekAndValley()?.trend()
+        return histories?.map { it.toStockWaveBo() }?.findInflectionPoint(6)?.merge()?.findPeekAndValley()?.littleTrend()
     }
 }

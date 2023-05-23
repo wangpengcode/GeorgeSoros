@@ -19,7 +19,7 @@ import java.util.*
  * 上一个点若为波峰,下一个值也为波峰,则上一个升差+（下一个值-上一个值）
  * 上一个点若为波谷,下一个值也为波谷,则上一个落差+（下一个值-上一个值）
  */
-fun List<InflectionPoint>.trend(): List<StockTrendWaveBo>? {
+fun List<InflectionPoint>.littleTrend(): List<StockTrendWaveBo>? {
     if (CollectionUtils.isEmpty(this) || this.size < 3) {
         return null
     }
