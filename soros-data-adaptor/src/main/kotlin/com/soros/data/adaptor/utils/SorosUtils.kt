@@ -27,8 +27,6 @@ fun List<InflectionPoint>.trend(): List<StockTrendWaveBo>? {
     var i = 1
     var lastDownTrendValue = BigDecimal.ZERO
     var lastUpTrendValue = BigDecimal.ZERO
-    var lastTrend: WaveDirectionEnum? = null
-
     var preTrendWave = StockTrendWaveBo(
             code = this[0].code,
             startInflectionPoint = this[0],
