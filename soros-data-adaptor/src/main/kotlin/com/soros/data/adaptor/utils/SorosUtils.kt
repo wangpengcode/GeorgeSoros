@@ -24,7 +24,7 @@ fun List<StockTrendWaveBo>.bigTrend(): List<StockTrendWaveBo> {
     var i = 0
     var pre = this[0]
     var result = mutableListOf<StockTrendWaveBo>()
-    while (i < this.size - 3) {
+    while (i < this.size - 2) {
         val first = this[i]
         val third = this[i + 2]
         if (first.isUpTrend() && third.endInflectionPoint!!.getValue() > first.endInflectionPoint!!.getValue()) {
@@ -70,6 +70,7 @@ fun List<StockTrendWaveBo>.bigTrend(): List<StockTrendWaveBo> {
             continue
         }
     }
+    result.add(pre)
     return result
 }
 
