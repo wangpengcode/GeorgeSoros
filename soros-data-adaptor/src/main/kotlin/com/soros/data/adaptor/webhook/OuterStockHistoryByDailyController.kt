@@ -11,6 +11,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.scheduling.annotation.Async
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
@@ -38,6 +39,16 @@ class OuterStockHistoryByDailyController(
         return ResponseCommonBody(
                 msg = "ok"
         )
+    }
+
+    @Scheduled(cron = "#{@historyJobForClear}")
+    fun historyJobForClear() {
+        logger.info("historyJobForClear start")
+        if (historyEntities.isNotEmpty()) {
+            saveHistories(historyEntities)
+            historyEntities.clear()
+        }
+        logger.info("historyJobForClear end")
     }
 
     private fun saveHistoryEntity(entity: StockHistoryEntity) {

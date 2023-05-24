@@ -101,4 +101,8 @@ inflection:
 
 market:
   config:
-    marketJobCron: 0 38 12,21 * * ?
+    marketJobCron: 0 30 16,21 * * ?
+
+common:
+  config:
+    historyJobForClearListCron: 0 12 16,22 * * ?

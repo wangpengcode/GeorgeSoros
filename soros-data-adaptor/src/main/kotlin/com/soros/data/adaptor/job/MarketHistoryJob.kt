@@ -25,7 +25,7 @@ class MarketHistoryJob(
 
     @Scheduled(cron = "#{@marketHistoryJobCron}")
     fun market() {
-        shIndex?.sortedBy { it.date }?.forEach { outer ->
+        szIndex?.sortedBy { it.date }?.forEach { outer ->
             val date = outer.date
             logger.info("market# date $date")
             val historyByDate = mutableListOf<StockHistoryEntity>()
