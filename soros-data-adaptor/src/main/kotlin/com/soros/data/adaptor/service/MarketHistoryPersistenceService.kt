@@ -15,6 +15,12 @@ class MarketHistoryPersistenceService(
 	} catch (e: Exception) {
 		throw e
 	}
+
+	fun findAll(): List<MarketEntity>? = try {
+		marketHistoryRepository.findAll().toList()
+	} catch (e: Exception) {
+		throw e
+	}
 	fun save(entity: MarketEntity) = try {
 		marketHistoryRepository.save(entity)
 	} catch (e: Exception) {

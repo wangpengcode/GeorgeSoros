@@ -101,7 +101,7 @@ inflection:
 
 market:
   config:
-    marketJobCron: 0 30 16,21 * * ?
+    marketJobCron: 0 30 19,21 * * ?
 
 common:
   config:
