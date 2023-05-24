@@ -105,6 +105,8 @@ fun List<StockHistoryEntity>.toMarketEntity(): MarketEntity? {
         market_stocks = histories.size.toBigInteger()
         zt_nums = histories.filter { it.zdRange!! >= ZT }.size.toBigInteger()
         dt_nums = histories.filter { it.zdRange!! <= DT }.size.toBigInteger()
+//        open_loss_nums = histories.filter { it.open }
+//        open_profit_nums
         flat_nums = histories.filter { it.zdRange!! == BigDecimal.ZERO }.size.toBigInteger()
         profit_nums = histories.filter { it.zdRange!! > BigDecimal.ZERO }.size.toBigInteger()
         loss_nums = histories.filter { it.zdRange!! < BigDecimal.ZERO }.size.toBigInteger()

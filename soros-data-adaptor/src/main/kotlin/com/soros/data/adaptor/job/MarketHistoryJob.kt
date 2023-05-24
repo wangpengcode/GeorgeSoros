@@ -57,31 +57,31 @@ class MarketHistoryJob(
                 logger.info("market#average date $date")
                 current.apply {
                     val zt_nums = before!!.filter { Objects.nonNull(it.zt_nums) }.map { it.zt_nums!!.toInt() }
-                    this!!.average_zt_nums = (zt_nums.sumBy { it } / zt_nums.size).toBigInteger()
+                    this!!.average_zt_nums = if(!CollectionUtils.isEmpty(zt_nums)) (zt_nums.sumBy { it } / zt_nums.size).toBigInteger() else null
 
                     val dt_nums = before.filter { Objects.nonNull(it.dt_nums) }.map { it.dt_nums!!.toInt() }
-                    this.average_dt_nums = (dt_nums.sumBy { it } / dt_nums.size).toBigInteger()
+                    this.average_dt_nums = if(!CollectionUtils.isEmpty(dt_nums)) (dt_nums.sumBy { it } / dt_nums.size).toBigInteger() else null
 
                     val profit_nums = before.filter { Objects.nonNull(it.profit_nums) }.map { it.profit_nums!!.toInt() }
-                    this.average_profit_nums = (profit_nums.sumBy { it } / profit_nums.size).toBigInteger()
+                    this.average_profit_nums =if(!CollectionUtils.isEmpty(profit_nums)) (profit_nums.sumBy { it } / profit_nums.size).toBigInteger() else null
 
                     val loss_nums = before.filter { Objects.nonNull(it.loss_nums) }.map { it.loss_nums!!.toInt() }
-                    this.average_loss_nums = (loss_nums.sumBy { it } / loss_nums.size).toBigInteger()
+                    this.average_loss_nums = if(!CollectionUtils.isEmpty(loss_nums)) (loss_nums.sumBy { it } / loss_nums.size).toBigInteger() else null
 
                     val market_total_amount = before.filter { Objects.nonNull(it.market_total_amount) }.map { it.market_total_amount!! }.toList()
                     this.average_market_total_amount = market_total_amount.stream().reduce(BigDecimal.ZERO,BigDecimal::add).divide(BigDecimal(market_total_amount.size), SCALE_OF_SOROS,RoundingMode.HALF_EVEN)
 
                     val open_loss_nums = before.filter { Objects.nonNull(it.open_loss_nums) }.map { it.open_loss_nums!!.toInt() }
-                    this.average_open_loss_nums = (open_loss_nums.sumBy { it }/ open_loss_nums.size).toBigInteger()
+                    this.average_open_loss_nums = if(!CollectionUtils.isEmpty(open_loss_nums)) (open_loss_nums.sumBy { it }/ open_loss_nums.size).toBigInteger() else null
 
                     val open_profit_nums = before.filter { Objects.nonNull(it.open_profit_nums) }.map { it.open_profit_nums!!.toInt() }
-                    this.average_open_profit_nums = (open_profit_nums.sumBy { it }/ open_profit_nums.size).toBigInteger()
+                    this.average_open_profit_nums = if(!CollectionUtils.isEmpty(open_profit_nums)) (open_profit_nums.sumBy { it }/ open_profit_nums.size).toBigInteger() else null
 
                     val open_high_close_down_nums = before.filter { Objects.nonNull(it.open_high_close_down_nums) }.map { it.open_high_close_down_nums!!.toInt() }
-                    this.average_open_high_close_down_nums = (open_high_close_down_nums.sumBy { it }/ open_high_close_down_nums.size).toBigInteger()
+                    this.average_open_high_close_down_nums = if(!CollectionUtils.isEmpty(open_high_close_down_nums)) (open_high_close_down_nums.sumBy { it }/ open_high_close_down_nums.size).toBigInteger() else null
 
                     val open_down_close_high_nums =  before.filter { Objects.nonNull(it.open_down_close_high_nums) }.map { it.open_down_close_high_nums!!.toInt() }
-                    this.average_open_down_close_high_nums = (open_down_close_high_nums.sumBy { it }/ open_down_close_high_nums.size).toBigInteger()
+                    this.average_open_down_close_high_nums = if(!CollectionUtils.isEmpty(open_down_close_high_nums)) (open_down_close_high_nums.sumBy { it }/ open_down_close_high_nums.size).toBigInteger() else null
 
                     val sh_close = before.filter { Objects.nonNull(it.sh_close) }.map { it.sh_close!! }
                     this.average_sh_close = sh_close.stream().reduce(BigDecimal.ZERO,BigDecimal::add).divide(BigDecimal(sh_close.size), SCALE_OF_SOROS,RoundingMode.HALF_EVEN)
