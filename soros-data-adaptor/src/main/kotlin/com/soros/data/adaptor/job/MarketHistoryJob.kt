@@ -15,6 +15,7 @@ import org.springframework.util.CollectionUtils
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
+import kotlin.streams.toList
 
 @Service
 class MarketHistoryJob(
@@ -31,6 +32,7 @@ class MarketHistoryJob(
     fun market() {
         szIndex?.sortedBy { it.date }?.forEach { outer ->
             val date = outer.date
+            val shHistory = shIndex?.stream()?.filter { it.date == outer.date }?.toList()?.get(0)
             logger.info("market# date $date")
             val historyByDate = mutableListOf<StockHistoryEntity>()
             stockInfo.queryAll()?.forEach { inner ->
@@ -38,12 +40,12 @@ class MarketHistoryJob(
                     historyByDate.add(its)
                 }
             }
-            val market = historyByDate.toMarketEntity()?.let {
-                it.apply {
-                    sh_close = shIndex?.find { this.date == date }?.close
-                    sz_close = szIndex?.find { this.date == date }?.close
+            val market = historyByDate.toMarketEntity()?.let {entity->
+                entity.apply {
+                    sh_close = shHistory?.close
+                    sz_close = outer.close
                 }
-                marketHistoryPersistenceService.save(it)
+                marketHistoryPersistenceService.save(entity)
             }
         }
         val allMarketHistories = marketHistoryPersistenceService.findAll()?.sortedBy { it.date }
