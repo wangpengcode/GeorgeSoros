@@ -101,4 +101,4 @@ inflection:
 
 market:
   config:
-    marketJobCron: 0 12 11,21 * * ?
+    marketJobCron: 0 38 12,21 * * ?

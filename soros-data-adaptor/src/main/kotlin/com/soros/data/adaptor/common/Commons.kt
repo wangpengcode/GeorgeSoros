@@ -7,5 +7,7 @@ class Commons {
         final val SCALE_OF_SOROS = 4
         final val INFLECTION_POINT_DAYS = 6
         final val BIG_TREND_TOLERATE_RANGE = BigDecimal("0.2")
+        final val ZT = BigDecimal("10")
+        final val DT = BigDecimal("-10")
     }
 }
