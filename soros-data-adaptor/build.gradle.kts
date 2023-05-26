@@ -49,6 +49,8 @@ dependencies {
     implementation("com.google.guava:guava:23.0")
     // https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox
     implementation ("org.apache.pdfbox:pdfbox:2.0.24")
+    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
 }
 
 tasks.withType<KotlinCompile> {
