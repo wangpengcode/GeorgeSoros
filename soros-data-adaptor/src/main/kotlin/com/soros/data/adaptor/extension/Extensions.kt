@@ -8,6 +8,8 @@ import com.soros.data.adaptor.common.Commons.Companion.SCALE_OF_SOROS
 import com.soros.data.adaptor.common.Commons.Companion.ZT
 import com.soros.data.adaptor.domain.bo.InflectionPoint
 import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
+import com.soros.data.adaptor.dto.request.StockDailyDataDto
+import com.soros.data.adaptor.dto.response.sz.Market
 import com.soros.data.adaptor.entity.MarketEntity
 import com.soros.data.adaptor.entity.StockHistoryEntity
 import com.soros.data.adaptor.enums.InflectionPointType
@@ -118,4 +120,18 @@ fun List<StockHistoryEntity>.toMarketEntity(): MarketEntity? {
         rush_down_from_high_nums = histories.filter { it.high!! > it.open && it.open!! > it.close && it.zdRange!! < BigDecimal("-5") }.size.toBigInteger()
     }
     return market
+}
+
+fun List<Market>.toListStockDailyDataDto(): List<StockDailyDataDto>? {
+    return this[0]?.data.stream().map { StockDailyDataDto(
+            code = it.zqdm,
+            date = it.jyrq,
+            open = it.ks.toBigDecimal(),
+            close = it.ss.toBigDecimal(),
+            high = it.zg.toBigDecimal(),
+            low = it.zd.toBigDecimal(),
+            zdRange = it.sdf.replace(",","").toBigDecimal(),
+            volume = it.cjgs.replace(",","").toBigDecimalOrNull()?.multiply(BigDecimal(10000)),
+            totalAmount = it.cjje.replace(",","").toBigDecimalOrNull()?.multiply(BigDecimal(10000))
+    ) }.toList()
 }

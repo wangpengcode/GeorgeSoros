@@ -51,6 +51,7 @@ dependencies {
     implementation ("org.apache.pdfbox:pdfbox:2.0.24")
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation("com.alibaba.fastjson2:fastjson2:2.0.32")
 }
 
 tasks.withType<KotlinCompile> {

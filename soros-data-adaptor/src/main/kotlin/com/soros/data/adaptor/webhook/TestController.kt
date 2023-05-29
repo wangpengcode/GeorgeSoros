@@ -1,7 +1,11 @@
 package com.soros.data.adaptor.webhook
 
+import com.soros.data.adaptor.config.MarketJobConfiguration
 import com.soros.data.adaptor.domain.bo.InflectionPoint
 import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
+import com.soros.data.adaptor.dto.request.StockDailyDataDto
+import com.soros.data.adaptor.dto.request.sz.SZMarketRequestDto
+import com.soros.data.adaptor.market.ShenZhenMarket
 import com.soros.data.adaptor.service.StockHistoryPersistenceService
 import com.soros.data.adaptor.service.StockInfoPersistenceService
 import com.soros.data.adaptor.transformer.toStockWaveBo
@@ -14,7 +18,21 @@ import org.springframework.web.bind.annotation.ResponseBody
 
 @Controller
 @RequestMapping("/test")
-class TestController(val history: StockHistoryPersistenceService, val info: StockInfoPersistenceService) {
+class TestController(val history: StockHistoryPersistenceService,
+                     val shenZhenMarket: ShenZhenMarket,
+                     val marketConfig: MarketJobConfiguration,
+                     val info: StockInfoPersistenceService) {
+    @RequestMapping("/sz/{stockNo}/{startDate}/{endDate}", method = [RequestMethod.GET])
+    @ResponseBody
+    fun shenZhenMarket(@PathVariable stockNo: String, @PathVariable  startDate: String, @PathVariable  endDate: String): List<StockDailyDataDto>? {
+        val request = SZMarketRequestDto(
+                url = marketConfig.szMarketUrl,
+                txtDMorJC = stockNo,
+                txtBeginDate = startDate,
+                txtEndDate = endDate
+        )
+       return shenZhenMarket.process(request)
+    }
 
     @RequestMapping("/inflection/{stockNo}", method = [RequestMethod.GET])
     @ResponseBody
