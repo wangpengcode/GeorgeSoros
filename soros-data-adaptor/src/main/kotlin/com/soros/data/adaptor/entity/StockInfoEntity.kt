@@ -34,7 +34,11 @@ data class StockInfoEntity(
 	
 	/** 上市日期 **/
 	@Column(name = "industry", length = 20)
-	var industry: String? = null
+	var industry: String? = null,
+
+	/** 上市日期 **/
+	@Column(name = "market", length = 20)
+	var market: String? = null
 ){
 //	fun haveDataRate(): BigDecimal {
 //		return downloadTimes?.let {
