@@ -9,10 +9,16 @@ import java.math.BigDecimal
 @ConfigurationProperties(prefix = "market.config")
 class MarketJobConfiguration {
     var marketJobCron: String = " 0 38 21,8 * * ?"
+    var szMarketJobCron: String = " 0 38 21,8 * * ?"
     var szMarketUrl: String = "http://www.szse.cn/api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1815_stock_snapshot&TABKEY=tab1"
-
+    var szInterval: Int = 5
     @Bean
     fun marketHistoryJobCron(): String {
         return marketJobCron
+    }
+
+    @Bean
+    fun szMarketHistoryJobCron(): String {
+        return szMarketJobCron
     }
 }

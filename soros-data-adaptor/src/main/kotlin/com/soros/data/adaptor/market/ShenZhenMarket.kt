@@ -17,11 +17,14 @@ import okhttp3.Request
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.concurrent.TimeUnit
 
 @Service
 class ShenZhenMarket() : AbstractMarketSourceApi<SZMarketRequestDto, List<StockDailyDataDto>?>() {
 
-    private val okHttpClient = OkHttpClient.Builder().followRedirects(false).build()
+    private val okHttpClient = OkHttpClient.Builder().followRedirects(false)
+            .readTimeout(10,TimeUnit.SECONDS)
+            .build()
 
     override fun retrieveDataFromMarket(req: SZMarketRequestDto): String? {
         var url = req.url + "&txtDMorJC=" + req.txtDMorJC + "&txtBeginDate=" + req.txtBeginDate + "&txtEndDate=" + req.txtEndDate
