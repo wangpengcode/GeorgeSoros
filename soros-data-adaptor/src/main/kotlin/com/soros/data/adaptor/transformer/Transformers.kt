@@ -19,7 +19,8 @@ fun StockInfo.toStockInfoEntity(): StockInfoEntity {
             ipoDate = this.ipoDate.orEmpty(),
             totalCapital = this.totalCapital,
             flowCapital = this.flowCapital,
-            industry = this.industry.orEmpty()
+            industry = this.industry.orEmpty(),
+            market = this.market.orEmpty()
     )
 }
 

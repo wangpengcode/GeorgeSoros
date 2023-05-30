@@ -9,5 +9,6 @@ data class StockInfo(
         var ipoDate: String? = null,
         var totalCapital: BigDecimal? = null,
         var flowCapital: BigDecimal? = null,
-        var industry: String? = null
+        var industry: String? = null,
+        var market: String? = null
 )
