@@ -23,7 +23,7 @@ class WaveJob(
         val waveService: StockWavePersistenceService
 ) {
 
-    @Scheduled(cron = "#{@waveJobCron}")
+//    @Scheduled(cron = "#{@waveJobCron}")
     fun waveJob() {
         logger.info("hello this is waveJob")
         stockInfo.queryAll()?.forEach {
