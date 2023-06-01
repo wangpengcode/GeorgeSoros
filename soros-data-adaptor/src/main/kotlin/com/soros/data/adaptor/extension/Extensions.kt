@@ -131,7 +131,7 @@ fun List<Market>.toListStockDailyDataDto(): List<StockDailyDataDto>? {
             high = it.zg.toBigDecimal(),
             low = it.zd.toBigDecimal(),
             zdRange = it.sdf.replace(",","").toBigDecimal(),
-            volume = it.cjgs.replace(",","").toBigDecimalOrNull()?.multiply(BigDecimal(10000)),
+            volume = it.cjgs.replace(",","").toBigDecimalOrNull()?.multiply(BigDecimal(100)), // 换算为手
             totalAmount = it.cjje.replace(",","").toBigDecimalOrNull()?.multiply(BigDecimal(10000))
     ) }.toList()
 }
