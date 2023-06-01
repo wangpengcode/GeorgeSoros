@@ -36,6 +36,10 @@ class StockHistoryPersistenceService(
 				?.map { it.date }?.orElse(null)
 	}
 
+	fun deleteAfterDateByStockNo(code: String, date: String) {
+		stockHistoryRepository.deleteByStockNo(code,date)
+	}
+
     companion object {
         val logger: Logger = LoggerFactory.getLogger(StockHistoryPersistenceService::class.java)
     }

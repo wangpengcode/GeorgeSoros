@@ -33,7 +33,11 @@ class SZMarketJob(
         logger.info("SZMarketJob#szMarket start ")
         val szStocks = info.queryAll()?.filter { MarketEnum.SZ.name.equals(it.market, ignoreCase = true) }?.toList()
         val now = LocalDateTime.now().format(formatter)
-
+//        szStocks?.forEach {
+//            history.deleteAfterDateByStockNo(it.code, "2023-05-23")
+//        }
+//        logger.info("SZMarketJob#szMarket delete after 2023-05-23 succeed ")
+//        return
         szStocks?.forEach {
             var maxDate = history.findMaxDateByStockNo(it.code)
             maxDate = if (Objects.isNull(maxDate)) START_DATE else maxDate

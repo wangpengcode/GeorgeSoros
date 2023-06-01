@@ -28,7 +28,7 @@ class ShenZhenMarket() : AbstractMarketSourceApi<SZMarketRequestDto, List<StockD
 
     override fun retrieveDataFromMarket(req: SZMarketRequestDto): String? {
         var url = req.url + "&txtDMorJC=" + req.txtDMorJC + "&txtBeginDate=" + req.txtBeginDate + "&txtEndDate=" + req.txtEndDate
-        logger.info("url $url")
+//        logger.info("url $url")
         var request = Request.Builder()
                 .url(url)
                 .build()
@@ -39,7 +39,7 @@ class ShenZhenMarket() : AbstractMarketSourceApi<SZMarketRequestDto, List<StockD
 
     override fun mappingData(rawData: String?): List<StockDailyDataDto>? {
         val list: List<Market>? = JSON.parseArray(rawData, Market::class.java)
-        logger.info("list ${list?.toJson()}")
+//        logger.info("list ${list?.toJson()}")
         return list?.toListStockDailyDataDto()
     }
 

@@ -103,7 +103,7 @@ market:
   config:
     marketJobCron: 0 37 20,21 * * ?
     szInterval: 5
-    szMarketJobCron: 0 0 20,21 * * ?
+    szMarketJobCron: 0 4 20,21 * * ?
 common:
   config:
     historyJobForClearListCron: 0 12 16,22 * * ?
