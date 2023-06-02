@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.util.CollectionUtils
+import java.sql.Timestamp
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -64,6 +65,7 @@ class SZMarketJob(
                         logger.error("SZMarketJob#code $stockNo save with error", e)
                     }
                 }
+                Thread.sleep( 10 * 60 * 1000)
                 maxDate = history.findMaxDateByStockNo(it.code)!!
             } while (maxDate!! <= now && !CollectionUtils.isEmpty(list))
         }

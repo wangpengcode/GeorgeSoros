@@ -17,19 +17,22 @@ import okhttp3.Request
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.net.InetSocketAddress
+import java.net.Proxy
 import java.util.concurrent.TimeUnit
 
 @Service
 class ShenZhenMarket() : AbstractMarketSourceApi<SZMarketRequestDto, List<StockDailyDataDto>?>() {
 
     private val okHttpClient = OkHttpClient.Builder().followRedirects(false)
+//            .proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress()))
             .readTimeout(10,TimeUnit.SECONDS)
             .build()
 
     override fun retrieveDataFromMarket(req: SZMarketRequestDto): String? {
         var url = req.url + "&txtDMorJC=" + req.txtDMorJC + "&txtBeginDate=" + req.txtBeginDate + "&txtEndDate=" + req.txtEndDate
 //        logger.info("url $url")
-        var request = Request.Builder()
+        var request = Request.Builder().removeHeader("User-Agent").addHeader("User-Agent","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36")
                 .url(url)
                 .build()
         var call = okHttpClient.newCall(request)
