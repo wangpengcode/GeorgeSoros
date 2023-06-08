@@ -29,7 +29,7 @@ class SZMarketJob(
 ) {
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-    @Scheduled(cron = "#{@szMarketHistoryJobCron}")
+//    @Scheduled(cron = "#{@szMarketHistoryJobCron}")
     fun szMarket() {
         logger.info("SZMarketJob#szMarket start ")
         val szStocks = info.queryAll()?.filter { MarketEnum.SZ.name.equals(it.market, ignoreCase = true) }?.toList()

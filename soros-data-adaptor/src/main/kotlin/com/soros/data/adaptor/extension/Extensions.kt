@@ -10,6 +10,7 @@ import com.soros.data.adaptor.domain.bo.InflectionPoint
 import com.soros.data.adaptor.domain.bo.StockTrendWaveBo
 import com.soros.data.adaptor.dto.request.StockDailyDataDto
 import com.soros.data.adaptor.dto.response.sz.Market
+import com.soros.data.adaptor.entity.BigTrendEntity
 import com.soros.data.adaptor.entity.MarketEntity
 import com.soros.data.adaptor.entity.StockHistoryEntity
 import com.soros.data.adaptor.enums.InflectionPointType
@@ -136,4 +137,16 @@ fun List<Market>.toListStockDailyDataDto(): List<StockDailyDataDto>? {
             range = it.zg.toBigDecimal().subtract(it.zd.toBigDecimal()).divide(it.zd.toBigDecimal(), SCALE_OF_SOROS,RoundingMode.HALF_EVEN),
             zdAmount = it.ss.toBigDecimal().subtract(it.qss.toBigDecimal())
     ) }.toList()
+}
+
+fun StockTrendWaveBo.toBigTrendEntity(dataType: String): BigTrendEntity {
+    return BigTrendEntity(
+            code = code,
+            startDate = startInflectionPoint!!.date,
+            endDate = endInflectionPoint!!.date,
+            waveDirection = waveDirectionEnum.name,
+            dataType = dataType,
+            lastDays = lastDays.toLong(),
+            range = range
+    )
 }

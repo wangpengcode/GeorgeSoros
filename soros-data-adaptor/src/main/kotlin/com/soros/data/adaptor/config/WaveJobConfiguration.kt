@@ -9,6 +9,7 @@ import java.math.BigDecimal
 @ConfigurationProperties(prefix = "wave.config")
 class WaveJobConfiguration {
     var waveJobCron: String = " 0 38 21,8 * * ?"
+    var bigTrendJobCron: String = " 0 38 21,8 * * ?"
 
     var range = 0.5
 
@@ -21,5 +22,10 @@ class WaveJobConfiguration {
     @Bean
     fun waveJobCron(): String {
         return waveJobCron
+    }
+
+    @Bean
+    fun bigTrendJobCron(): String {
+        return bigTrendJobCron
     }
 }
