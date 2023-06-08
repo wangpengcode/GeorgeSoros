@@ -9,6 +9,9 @@ import javax.persistence.*
 @EntityListeners(AuditingEntityListener::class)
 data class BigTrendEntity(
         @Id
+        @GeneratedValue(strategy = GenerationType.SEQUENCE)
+        var id: Long? = null,
+
         @Column(name = "code", length = 20)
         val code: String,
 
@@ -28,5 +31,5 @@ data class BigTrendEntity(
         var lastDays: Long = 0,
 
         @Column(name = "range")
-        var range: BigDecimal = BigDecimal.ZERO
+        var range: BigDecimal? = BigDecimal.ZERO
 )

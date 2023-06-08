@@ -89,7 +89,7 @@ customer:
 wave:
   config:
     waveJobCron: 0 10 18,22 * * ?
-    bigTrendJobCron: 0 11 10,22 * * ?
+    bigTrendJobCron: 0 27 10,22 * * ?
     range: 0.5
     multiWaveInterval: 44
     inflectionPointDays: 10

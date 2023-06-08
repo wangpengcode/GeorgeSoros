@@ -20,7 +20,7 @@ class BigTrendPersistenceService(
                     try {
                         repository.save(it2)
                     } catch (e: Exception) {
-                        if (e !is DataIntegrityViolationException) {
+                        if (e is DataIntegrityViolationException) {
                             logger.warn("already save {}", it2.code)
                         } else {
                             logger.error("save {} error", it2.code, e)
