@@ -1,25 +1,27 @@
 package com.soros.data.adaptor.entity
 
-import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import lombok.AllArgsConstructor
+import lombok.NoArgsConstructor
 import java.math.BigDecimal
+import java.math.BigInteger
 import javax.persistence.*
 
-@Entity
-@Table(name = "BIG_TREND")
-@EntityListeners(AuditingEntityListener::class)
+@Entity(name = "BIG_TREND")
+@AllArgsConstructor
+@NoArgsConstructor
 data class BigTrendEntity(
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE)
         var id: Long? = null,
 
-        @Column(name = "code", length = 20)
-        val code: String,
+        @Column(name = "st_code", length = 20)
+        var code: String,
 
         @Column(name = "wave_direction", length = 20)
-        val waveDirection: String,
+        var waveDirection: String,
 
         @Column(name = "data_type", length = 20)
-        val dataType: String,
+        var dataType: String,
 
         @Column(name = "start_date")
         var startDate: String? = null,
@@ -28,8 +30,8 @@ data class BigTrendEntity(
         var endDate: String? = null,
 
         @Column(name = "last_days")
-        var lastDays: Long = 0,
+        var lastDays: BigInteger? = null,
 
-        @Column(name = "range")
+        @Column(name = "st_range")
         var range: BigDecimal? = BigDecimal.ZERO
 )

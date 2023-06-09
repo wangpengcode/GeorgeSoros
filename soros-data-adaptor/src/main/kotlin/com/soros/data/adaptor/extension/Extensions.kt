@@ -146,7 +146,7 @@ fun StockTrendWaveBo.toBigTrendEntity(dataType: String): BigTrendEntity {
             endDate = endInflectionPoint!!.date,
             waveDirection = waveDirectionEnum.name,
             dataType = dataType,
-            lastDays = lastDays.toLong(),
+            lastDays = lastDays.toBigInteger(),
             range = range
     )
 }

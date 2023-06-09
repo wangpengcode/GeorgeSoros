@@ -1,6 +1,7 @@
 package com.soros.data.adaptor.service
 
 import com.soros.data.adaptor.entity.BigTrendEntity
+import com.soros.data.adaptor.extension.toJson
 import com.soros.data.adaptor.repository.BigTrendRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -18,6 +19,7 @@ class BigTrendPersistenceService(
             } catch (e: Exception) {
                 it.forEach { it2 ->
                     try {
+                        logger.info("BigTrendPersistenceService ${it2.toJson()}")
                         repository.save(it2)
                     } catch (e: Exception) {
                         if (e is DataIntegrityViolationException) {
@@ -39,9 +41,9 @@ class BigTrendPersistenceService(
         logger.error("#save error:", e)
     }
 
-    fun findByStockNo(stockNo: String): List<BigTrendEntity>? {
-        return repository.findByStockNo(stockNo)
-    }
+//    fun findByStockNo(stockNo: String): List<BigTrendEntity>? {
+//        return repository.findByStockNo(stockNo)
+//    }
 
 
     fun queryAll(): List<BigTrendEntity>? = try {
