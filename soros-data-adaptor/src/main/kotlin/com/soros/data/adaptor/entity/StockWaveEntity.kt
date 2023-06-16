@@ -12,10 +12,10 @@ data class StockWaveEntity(
         @GeneratedValue(strategy = GenerationType.SEQUENCE)
         var id: Long? = null,
 
-        @Column(name = "code", length = 20)
+        @Column(name = "st_code", length = 20)
         val code: String,
 
-        @Column(name = "type", length = 20)
+        @Column(name = "st_type", length = 20)
         val type: String,
 
         @Column(name = "start_date")
@@ -30,7 +30,7 @@ data class StockWaveEntity(
         @Column(name = "direction")
         var direction: String? = null,
 
-        @Column(name = "range")
+        @Column(name = "st_range")
         var range: BigDecimal? = null,
 
         @Column(name = "wave_type")
